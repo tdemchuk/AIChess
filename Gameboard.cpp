@@ -266,6 +266,9 @@ std::vector<glm::vec2> Gameboard::mapBase(Piece & piece)
 	return mapped;
 }
 
+/*
+	Cull threats Function - Removes threats from move list
+*/
 std::vector<Gameboard::Move> Gameboard::cullThreats(std::vector<Move>& moves, Piece& piece, const glm::vec2 kingpos)
 {
 	std::vector<Move> safe;
