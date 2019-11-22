@@ -5,7 +5,7 @@
 #include "Piece.h"
 
 /*
-	Represents a single cell on a chess gameboard - Tennyson likes ppeni...es
+	Represents a single cell on a chess gameboard
 */
 class Cell
 {
