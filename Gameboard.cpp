@@ -85,6 +85,13 @@ Piece * Gameboard::move(Piece * piece, Move to)
 	return captured;
 }
 
+void Gameboard::undo() 
+{
+	if (m_history.empty()) return;	// nothing to undo
+
+
+}
+
 std::vector<Gameboard::Option> Gameboard::generateOptions(std::vector<Piece*>& owned, Piece& king)
 {
 	Option op;				
