@@ -21,7 +21,7 @@ public:
 
 private:
 	Piece* m_piece = nullptr;		// The piece that occupies this cell on the gameboard
-	const Color m_color;				// This cell's color
+	const Color m_color;			// This cell's color
 };
 
 /*
