@@ -80,9 +80,39 @@ Piece * Gameboard::move(Piece * piece, Move to)
 {
 	int from = xytoi(piece->getPos());
 	Piece* captured = place(piece, to.coord);
+
+	// Backup to History Stack
+	Hist last;
+	last.captured = captured;
+	last.from = piece->getPos();
+	last.to = to.coord;
+	last.movedStatus = piece->getStatus();
+	if (captured) last.capturedStatus = captured->getStatus();
+	m_history.push(last);
+
 	piece->setStatus(Piece::Status::NORMAL);					// Mark moved piece as dirty
 	if (captured) captured->setStatus(Piece::Status::CAPTURED);	// Mark captured piece as captured
 	return captured;
+}
+
+Piece * Gameboard::undo()
+{
+	if (m_history.empty()) return nullptr;	// nothing to undo
+
+	Hist last = m_history.top();
+	int from = xytoi(last.from);
+	int to = xytoi(last.to);
+	m_board[from].set(m_board[to].get());	// Move piece at 'to' back to 'from'
+	m_board[to].set(last.captured);			// Place captured piece back at 'to' [or nullptr if no piece was captured]
+	m_board[from].get()->setPos(last.from.x, last.from.y);	// Revert moved piece's internal position			
+	m_board[from].get()->setStatus(last.movedStatus);		// Revert moved piece's status
+	if (last.captured) {
+		last.captured->setPos(last.to.x, last.to.y);	// Revert captured piece's internal position
+		last.captured->setStatus(last.capturedStatus);	// Revert captured piece's status
+	}
+
+	m_history.pop();		// pop from stack
+	return last.captured;	// return captured 
 }
 
 std::vector<Gameboard::Option> Gameboard::generateOptions(std::vector<Piece*>& owned, Piece& king)

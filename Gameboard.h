@@ -3,6 +3,7 @@
 
 #include "Color.h"
 #include "Piece.h"
+#include <stack>
 
 /*
 	Represents a single cell on a chess gameboard
@@ -38,6 +39,14 @@ public:
 		std::vector<Move> moves;	// All board coordinates that the piece can move to
 	};
 
+	struct Hist {
+		glm::vec2 from;				
+		glm::vec2 to;
+		Piece* captured;
+		Piece::Status capturedStatus;
+		Piece::Status movedStatus;
+	};
+
 
 	static const int ROW = 8;
 	static const int COL = 8;
@@ -53,6 +62,7 @@ public:
 	Piece* place(Piece* piece, glm::vec2 coord);	// Places the given piece at the specified coordinate
 	Piece* place(Piece* piece, char file, int rank);// Places the given piece at the specified rank and file
 	Piece* move(Piece* piece, Move to);				// Moves the given piece to the given location and returns the captured piece, if any
+	Piece* undo();									// Undoes the changes made by the previous call to "move". Returns the pointer to the previously captured piece
 	std::vector<Option> generateOptions(std::vector<Piece*>& owned, Piece& king);	// Generates options that a given set of pieces can make on the current boardstate
 	bool threatAssess(Piece& piece);				// Returns true if the given piece is under attack in the given boardstate
 	bool isValidCoord(glm::vec2 coord) const;		// Returns true if the coordinate is on the board
@@ -70,6 +80,7 @@ private:
 	
 
 	std::vector<Cell> m_board;	// board has 64 cells
+	std::stack<Hist> m_history;	// move history stack
 };
 
 #endif
