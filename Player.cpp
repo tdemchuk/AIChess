@@ -20,6 +20,15 @@ const Color Player::team() const
 	return m_team;
 }
 
+std::string Player::teamStr() const
+{
+	switch (m_team) {
+	case BLACK: return "Black";
+	case WHITE: return "White";
+	}
+	return "NO TEAM";
+}
+
 void Player::create(Piece::Type type, glm::vec2 pos, Gameboard& board)
 {
 	if (!board.isValidCoord(pos)) throw std::out_of_range("Spawn Point is Not a Valid Board Coordinate");

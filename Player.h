@@ -20,11 +20,11 @@ public:
 	~Player();
 
 	const Color team() const;										// Return the team this player is on
+	std::string teamStr() const;									// Returns a string decsribing which team this player is on [color string]
 	void create(Piece::Type type, glm::vec2 pos, Gameboard& board);	// Create a piece as owned by this Player and place on the given gameboard
 	const std::vector<Piece*>& getOwned() const;					// Returns reference to the list of pieces this player owns
 	void capture(Piece* piece);										// Adds a piece to the list of pieces this player has captured
 	const std::vector<Piece*>& getCaptured() const;					// Returns reference to the list of pieces this player has captured
-	GameState takeTurn();											// Player takes turn
 
 private:
 	const Color m_team;

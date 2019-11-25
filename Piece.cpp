@@ -114,7 +114,7 @@ bool Piece::canPromote() const
 	// Only pawns on their 8th (relative) rank can be promoted
 	if (m_type == PAWN) {
 		if (m_orientation == -1) {
-			if (rank() == 0) return true;
+			if (rank() == 1) return true;
 			else return false;
 		}
 		else if (m_orientation == 1) {
@@ -127,6 +127,7 @@ bool Piece::canPromote() const
 
 bool Piece::promote(Piece::Type type)
 {
+	// TODO
 	// Assumes this piece is valid for promotion
 	bool goodtype = false;
 
