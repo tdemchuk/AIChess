@@ -139,7 +139,7 @@ std::vector<Gameboard::Option> Gameboard::generateOptions(std::vector<Piece*>& o
 	return options;
 }
 
-bool Gameboard::threatAssess(Piece & piece)	// Returns true if threat assessment passes, false if fails
+bool Gameboard::threatAssess(Piece & piece)	// Returns true if passed in piece is under attack
 {
 	static const std::vector<glm::vec2> los = {	// line of sight directions from piece to check
 		glm::vec2(1,0), glm::vec2(1,1), glm::vec2(0,1), glm::vec2(-1,1),

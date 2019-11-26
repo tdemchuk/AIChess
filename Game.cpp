@@ -8,9 +8,10 @@ void Game::play(UI* ui) {
 
 	// Local Vars
 	Gameboard	board;
-	int			curPlayer = 0;				// current player in game
-	bool		done = false;				// If Game has finished [win/loss/draw occurred]
+	int			curPlayer	= 0;			// current player in game
+	bool		done		= false;		// If Game has finished [win/loss/draw occurred]
 	std::vector<Gameboard::Option> moves;	// List of moves current player can make
+	bool		inCheck		= false;		// If the current players King is in check at the start of their turn
 
 	// 1) Init Players, Pieces
 	Player players[] = {Player(Color::WHITE), Player(Color::BLACK)};
@@ -46,8 +47,31 @@ void Game::play(UI* ui) {
 	while (!done) {
 
 		// 2) Generate list of moves for current player
-		moves = board.generateOptions(players[curPlayer].getOwned(), *(kings[curPlayer]));
+		moves = board.generateOptions(players[curPlayer].getOwned(), *(kings[curPlayer]));		// TODO - debug write access violation error - nullptr issue
 
 		// 3) Test to see if king is in check
+		inCheck = board.threatAssess(*(kings[curPlayer]));
+
+		// 4) Check end conditions
+		if (moves.size() == 0) {
+			if (inCheck) {	// Other player won
+				ui->drawMessage("Player __ Won!");	// TODO - make non-current player number print here
+			}
+			else {			// draw
+				ui->drawMessage("Draw!");
+			}
+			done = true;
+			continue;
+		}
+
+		// 5) Prompt Current Player to make a move
+		ui->promptMove();	// TODO - make function return user selected move
+
+		// 6) Update Game State, Update UI
+			// TODO - update game state based on user selected move
+		ui->drawBoard(board);
+
+		// 7) Swap Current Player and Repeat
+		curPlayer = ((curPlayer * 2) % 2) + 1;
 	}
 }
