@@ -29,7 +29,7 @@ std::string Player::teamStr() const
 	return "NO TEAM";
 }
 
-void Player::create(Piece::Type type, glm::vec2 pos, Gameboard& board)
+Piece* Player::create(Piece::Type type, glm::vec2 pos, Gameboard& board)
 {
 	if (!board.isValidCoord(pos)) throw std::out_of_range("Spawn Point is Not a Valid Board Coordinate");
 	Piece* piece = new Piece(type, m_team);		// create the piece
@@ -38,9 +38,10 @@ void Player::create(Piece::Type type, glm::vec2 pos, Gameboard& board)
 	overwritten = board.place(piece, pos);		// Place the piece on the board
 	if (overwritten) std::cout << "A Piece was Overwritten!\n";
 	delete overwritten;							// Clean up overwritten piece --> will likely cause errors throughoput program run
+	return piece;
 }
 
-const std::vector<Piece*>& Player::getOwned() const
+std::vector<Piece*>& Player::getOwned()
 {
 	return m_owned;
 }
@@ -50,7 +51,7 @@ void Player::capture(Piece* piece)
 	m_captured.push_back(piece);
 }
 
-const std::vector<Piece*>& Player::getCaptured() const
+std::vector<Piece*>& Player::getCaptured()
 {
 	return m_captured;
 }

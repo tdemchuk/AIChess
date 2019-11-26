@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "Piece.h"
+#include "UI.h"
 #include <vector>
 #include <iostream>
 
@@ -13,7 +14,7 @@ class Game
 {
 public:
 
-	void play();	// start a new game
+	void play(UI* ui);	// start a new game
 
 private:
 

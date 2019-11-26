@@ -51,7 +51,9 @@ Gameboard::Gameboard()
 
 Piece * Gameboard::check(glm::vec2 coord) const
 {
-	if (!isValidCoord(coord)) return nullptr;
+	if (!isValidCoord(coord)) {
+		return nullptr;
+	}
 	else return m_board[xytoi(coord)].get();
 }
 
@@ -67,7 +69,7 @@ Piece * Gameboard::place(Piece * piece, glm::vec2 coord)
 	Piece* captured = m_board[index].get();	// backup captured piece
 	m_board[index].set(piece);
 	piece->setPos(coord.x, coord.y);	// Update board coordinate [but NOT status]
-	captured->setPos(-1, -1);	
+	if (captured) captured->setPos(-1, -1);	
 	return captured;
 }
 
