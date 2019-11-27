@@ -26,7 +26,7 @@ void Cell::set(Piece* p)
 }
 
 
-/* GAMEBOARD CLASS DEFINTIONS */
+/* GAMEBOARD CLASS DEFINITIONS */
 
 Gameboard::Gameboard()
 {
@@ -126,7 +126,7 @@ std::vector<Gameboard::Option> Gameboard::generateOptions(std::vector<Piece*>& o
 	for (int i = 0; i < owned.size(); i++) {
 		// Cull pieces that are off the board
 		if (owned[i]->isOnBoard()) {
-			moves = generateMoves(*owned[i], king.getPos());	// Generate moves for this piece
+			moves = generateMoves(*(owned[i]), king.getPos());	// Generate moves for this piece
 			if (moves.size() > 0) {
 				// If piece has moves to make, wrap in Option and add to list
 				op.piece = owned[i];

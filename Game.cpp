@@ -43,6 +43,12 @@ void Game::play(UI* ui) {
 
 	ui->drawBoard(board);
 
+	// Print all pieces owned by current player - DEBUG
+	std::vector<Piece*> owned = players[curPlayer].getOwned();
+	for (int i = 0; i < owned.size(); i++) {
+		std::cout << owned[i]->ID() << " | " << owned[i]->teamStr() << " | " << owned[i]->typeStr() << " | " << owned[i]->statusStr() << " | [" << owned[i]->getPos().x << "," << owned[i]->getPos().y << "]\n";
+	}
+
 	// Begin Game Loop
 	while (!done) {
 

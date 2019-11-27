@@ -22,9 +22,9 @@ public:
 	const Color team() const;											// Return the team this player is on
 	std::string teamStr() const;										// Returns a string decsribing which team this player is on [color string]
 	Piece* create(Piece::Type type, glm::vec2 pos, Gameboard& board);	// Create a piece as owned by this Player and place on the given gameboard
-	std::vector<Piece*>& getOwned();						// Returns reference to the list of pieces this player owns
+	std::vector<Piece*>& getOwned();									// Returns reference to the list of pieces this player owns
 	void capture(Piece* piece);											// Adds a piece to the list of pieces this player has captured
-	std::vector<Piece*>& getCaptured();						// Returns reference to the list of pieces this player has captured
+	std::vector<Piece*>& getCaptured();									// Returns reference to the list of pieces this player has captured
 
 private:
 	const Color m_team;

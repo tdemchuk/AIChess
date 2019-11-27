@@ -60,7 +60,7 @@ void ConsoleUI::drawBoard(const Gameboard& board) const
 	for (int i = 0; i < board.COL; i++) {
 		std::cout << "---";
 	}
-	std::cout << "\n    ";
+	std::cout << "\n     ";
 	for (int i = 0; i < board.COL; i++) {
 		std::cout << (char)(i + 97) << "  ";
 	}
