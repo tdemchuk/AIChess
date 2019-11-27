@@ -102,31 +102,44 @@ Piece * Gameboard::undo()
 	if (m_history.empty()) return nullptr;	// nothing to undo
 
 	Hist last = m_history.top();
+	Piece* moved = nullptr;
 	int from = xytoi(last.from);
 	int to = xytoi(last.to);
-	m_board[from].set(m_board[to].get());	// Move piece at 'to' back to 'from'
-	m_board[to].set(last.captured);			// Place captured piece back at 'to' [or nullptr if no piece was captured]
-	m_board[from].get()->setPos(last.from.x, last.from.y);	// Revert moved piece's internal position			
-	m_board[from].get()->setStatus(last.movedStatus);		// Revert moved piece's status
+
+	// Revert moved piece
+	moved = m_board[to].get();
+	moved->setPos(last.from.x, last.from.y);		
+	moved->setStatus(last.movedStatus);	
+	m_board[from].set(moved);
+
+	// Revert captured
 	if (last.captured) {
-		last.captured->setPos(last.to.x, last.to.y);	// Revert captured piece's internal position
-		last.captured->setStatus(last.capturedStatus);	// Revert captured piece's status
+		last.captured->setPos(last.to.x, last.to.y);
+		last.captured->setStatus(last.capturedStatus);
 	}
+	m_board[to].set(last.captured);			
 
 	m_history.pop();		// pop from stack
 	return last.captured;	// return captured 
 }
 
-std::vector<Gameboard::Option> Gameboard::generateOptions(std::vector<Piece*>& owned, Piece& king)
+std::vector<Gameboard::Playable> Gameboard::genPlayables(std::vector<Piece*>& owned, Piece& king)
 {
-	Option op;				
+	Playable op;
 	std::vector<Move> moves;		// Moves a single piece can make
-	std::vector<Option> options;	// Options the player has this turn
+	std::vector<Playable> options;	// Options the player has this turn
 
 	for (int i = 0; i < owned.size(); i++) {
+		std::cout << "Processing ";
+		print(owned[i]);
+		std::cout << '\n';
 		// Cull pieces that are off the board
 		if (owned[i]->isOnBoard()) {
-			moves = generateMoves(*(owned[i]), king.getPos());	// Generate moves for this piece
+			std::cout << "Piece on board. Generating Moves:\n";
+			moves = generateMoves(*(owned[i]), king);	// Generate moves for this piece
+			std::cout << "Piece ";
+			print(owned[i]);
+			std::cout << " Has " << moves.size() << " Generated Moves\n\n";
 			if (moves.size() > 0) {
 				// If piece has moves to make, wrap in Option and add to list
 				op.piece = owned[i];
@@ -139,7 +152,7 @@ std::vector<Gameboard::Option> Gameboard::generateOptions(std::vector<Piece*>& o
 	return options;
 }
 
-bool Gameboard::threatAssess(Piece & piece)	// Returns true if passed in piece is under attack
+bool Gameboard::isThreatened(Piece & piece)	// Returns true if passed in piece is under attack
 {
 	static const std::vector<glm::vec2> los = {	// line of sight directions from piece to check
 		glm::vec2(1,0), glm::vec2(1,1), glm::vec2(0,1), glm::vec2(-1,1),
@@ -216,7 +229,7 @@ bool Gameboard::isValidCoord(glm::vec2 coord) const
 	else return true;
 }
 
-std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, const glm::vec2 kingpos)
+std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king)
 {
 	Move move;
 	std::vector<Move> moves;
@@ -229,16 +242,28 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, const glm::
 	bool extend;
 	const bool isPawn = (piece.type() == Piece::Type::PAWN ? true : false);
 
+	std::cout << "Piece is Pawn? : " << isPawn << '\n';
+	std::cout << "Moveset is Extendable? : " << moveset.extendable << '\n';
+	std::cout << "Orientation : " << piece.orientation() <<'\n';
+	std::cout << "Mapping Pieces Base Moveset Vectors :\n";
+
 	mapped = mapBase(piece);
 
+	std::cout << "Processing Mapped Vectors:\n";
 	for (int i = 0; i < mapped.size(); i++) {
-		if (!isValidCoord(mapped[i])) continue;	// if mapped is off board, continue with next mapped coord
+		std::cout << "Mapped [" << mapped[i].x << "," << mapped[i].y << "]";
+		if (!isValidCoord(mapped[i])) {
+			std::cout << " : Invalid Coord [Off Board]\n";
+			continue;	// if mapped is off board, continue with next mapped coord
+		}
+		std::cout << '\n';
 		checkpos = mapped[i];
 		atPos = check(checkpos);
 		extend = moveset.extendable;
 
 		do {
 			move.coord = checkpos;
+			std::cout << "Checking Pos [" << checkpos.x << "," << checkpos.y << "]\n";
 			if (atPos) {
 				extend = false;
 				if (!isPawn && atPos->team() != team) moves.push_back(move);
@@ -276,7 +301,7 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, const glm::
 		}
 	}
 
-	moves = cullThreats(moves, piece, kingpos);
+	moves = sanitize(moves, piece, king);
 
 	return moves;
 }
@@ -289,10 +314,14 @@ std::vector<glm::vec2> Gameboard::mapBase(Piece & piece)
 	int orientation = piece.orientation();
 
 	for (int i = 0; i < base.size(); i++) {
-		map = base[i] + piece.getPos();
+		map.x = base[i].x;
+		map.y = base[i].y;
 		map.x *= orientation;
 		map.y *= orientation;
+		map.x = map.x + piece.getPos().x;
+		map.y = map.y + piece.getPos().y;
 		mapped.push_back(map);
+		std::cout << "Base [" << base[i].x << "," << base[i].y << "] Mapped to [" << map.x << "," << map.y << "]\n";
 	}
 
 	return mapped;
@@ -301,25 +330,21 @@ std::vector<glm::vec2> Gameboard::mapBase(Piece & piece)
 /*
 	Cull threats Function - Removes threats from move list
 */
-std::vector<Gameboard::Move> Gameboard::cullThreats(std::vector<Move>& moves, Piece& piece, const glm::vec2 kingpos)
+std::vector<Gameboard::Move> Gameboard::sanitize(std::vector<Move>& moves, Piece& piece, Piece& king)
 {
 	std::vector<Move> safe;
-	glm::vec2 from = piece.getPos();
-	Piece* captured = nullptr;
-	const Piece::Status pStatus = piece.getStatus();
-	Piece::Status cStatus = Piece::Status::NORMAL;
 
 	for (int i = 0; i < moves.size(); i++) {
-		captured = check(moves[i].coord);
-		if(captured) cStatus = captured->getStatus();
-		captured = move(&piece, moves[i]);
-		if (!threatAssess(piece)) {
+		// 1) Make Move
+		move(&piece, moves[i]);
+
+		// 2) Check if move is safe
+		if (!isThreatened(king)) {
 			safe.push_back(moves[i]);
 		}
-		place(&piece, from);
-		piece.setStatus(pStatus);
-		place(captured, moves[i].coord);
-		if (captured) captured->setStatus(cStatus);
+
+		// 3) Undo Move
+		undo();
 	}
 
 	return safe;
@@ -349,4 +374,9 @@ int Gameboard::ftox(char file) const
 int Gameboard::rtoy(int rank) const
 {
 	return rank - 1;		// Rank is 1-indexed, coordinates are 0-indexed
+}
+
+void Gameboard::print(Piece* piece)
+{
+	std::cout << piece->ID() << " | " << piece->teamStr() << " | " << piece->typeStr() << " | " << piece->statusStr() << " | [" << piece->getPos().x << "," << piece->getPos().y << "]";
 }

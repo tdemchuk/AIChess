@@ -69,7 +69,18 @@ void ConsoleUI::drawBoard(const Gameboard& board) const
 }
 
 // Prompts the current player to make a move
-void ConsoleUI::promptMove() {}
+void ConsoleUI::promptMove(std::vector<Gameboard::Playable>& moves) 
+{
+	// Local Vars
+	Piece* cur = nullptr;
+
+	std::cout << "\nSelect a Piece To Move [Enter Index From Following List] :\n";
+
+	for (int i = 0; i < moves.size(); i++) {
+		cur = moves[i].piece;
+		std::cout << i << " : " << cur->teamStr() << " " << cur->typeStr() << " at [" << cur->getPos().x << "," << cur->getPos().y << "]\n";
+	}
+}
 
 // Prompts the current player to choose what to promote a piece to 
 void ConsoleUI::promptPromote() {}

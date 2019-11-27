@@ -8,10 +8,10 @@ void Game::play(UI* ui) {
 
 	// Local Vars
 	Gameboard	board;
-	int			curPlayer	= 0;			// current player in game
-	bool		done		= false;		// If Game has finished [win/loss/draw occurred]
-	std::vector<Gameboard::Option> moves;	// List of moves current player can make
-	bool		inCheck		= false;		// If the current players King is in check at the start of their turn
+	int			curPlayer	= 0;				// current player in game
+	bool		done		= false;			// If Game has finished [win/loss/draw occurred]
+	std::vector<Gameboard::Playable> playables;	// List of moves current player can make
+	bool		inCheck		= false;			// If the current players King is in check at the start of their turn
 
 	// 1) Init Players, Pieces
 	Player players[] = {Player(Color::WHITE), Player(Color::BLACK)};
@@ -43,23 +43,26 @@ void Game::play(UI* ui) {
 
 	ui->drawBoard(board);
 
-	// Print all pieces owned by current player - DEBUG
+	// Print all pieces owned by current player - DEBUG ONLY
+#ifdef DEBUG
 	std::vector<Piece*> owned = players[curPlayer].getOwned();
 	for (int i = 0; i < owned.size(); i++) {
 		std::cout << owned[i]->ID() << " | " << owned[i]->teamStr() << " | " << owned[i]->typeStr() << " | " << owned[i]->statusStr() << " | [" << owned[i]->getPos().x << "," << owned[i]->getPos().y << "]\n";
 	}
+#endif
 
 	// Begin Game Loop
 	while (!done) {
 
 		// 2) Generate list of moves for current player
-		moves = board.generateOptions(players[curPlayer].getOwned(), *(kings[curPlayer]));		// TODO - debug write access violation error - nullptr issue
+		playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));		// TODO - debug write access violation error - nullptr issue
+		std::cout << "pieces with moves for player " << playables.size() <<'\n';
 
 		// 3) Test to see if king is in check
-		inCheck = board.threatAssess(*(kings[curPlayer]));
+		inCheck = board.isThreatened(*(kings[curPlayer]));
 
 		// 4) Check end conditions
-		if (moves.size() == 0) {
+		if (playables.size() == 0) {
 			if (inCheck) {	// Other player won
 				ui->drawMessage("Player __ Won!");	// TODO - make non-current player number print here
 			}
@@ -71,13 +74,16 @@ void Game::play(UI* ui) {
 		}
 
 		// 5) Prompt Current Player to make a move
-		ui->promptMove();	// TODO - make function return user selected move
+		ui->promptMove(playables);	// TODO - make function return user selected move
 
 		// 6) Update Game State, Update UI
 			// TODO - update game state based on user selected move
 		ui->drawBoard(board);
 
 		// 7) Swap Current Player and Repeat
-		curPlayer = ((curPlayer * 2) % 2) + 1;
+		curPlayer = 1 - curPlayer;
+
+		if (curPlayer == 0) done = true;		// DEBUG
+		done = true;
 	}
 }
