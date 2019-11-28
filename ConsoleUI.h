@@ -14,7 +14,7 @@ public:
 	glm::vec2 promptMove(std::vector<Gameboard::Playable>& moves) override;
 
 	// Prompts the current player to choose what to promote a piece to 
-	void promptPromote() override;
+	Piece::Type promptPromote() override;
 
 	// Prompts the user to select a mode of play (2-Player vs 1P & AI --> Difficulty selection)
 	void promptGameMode() override;

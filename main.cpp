@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 #ifndef GUI_ON
 	UI* ui = new ConsoleUI();
 #endif
-	// TODO - Add prompt for Game Difficulty Here, pass into Game's play() fucntion
+	// TODO - Add prompt for Game Mode/Difficulty Here, pass into Game's play() function
 
 	// Launch Game
 	Game game;

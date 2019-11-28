@@ -160,36 +160,36 @@ void Piece::setMoveset()
 	switch (m_type) {
 	case KING:
 		m_moveset.base = std::vector<glm::vec2>{
-			glm::vec2(1,0), glm::vec2(1,1), glm::vec2(0,1), glm::vec2(-1,1),
-			glm::vec2(-1,0), glm::vec2(-1,-1), glm::vec2(0,-1), glm::vec2(1,-1)
+			glm::vec2(0,1), glm::vec2(1,1), glm::vec2(1,0), glm::vec2(1,-1),
+			glm::vec2(0,-1), glm::vec2(-1,-1), glm::vec2(-1,0), glm::vec2(-1,1)
 		};
 		extend = false;
 		break;
 	case QUEEN:
 		m_moveset.base = std::vector<glm::vec2>{
-			glm::vec2(1,0), glm::vec2(1,1), glm::vec2(0,1), glm::vec2(-1,1),
-			glm::vec2(-1,0), glm::vec2(-1,-1), glm::vec2(0,-1), glm::vec2(1,-1)
+			glm::vec2(0,1), glm::vec2(1,1), glm::vec2(1,0), glm::vec2(1,-1),
+			glm::vec2(0,-1), glm::vec2(-1,-1), glm::vec2(-1,0), glm::vec2(-1,1)
 		};
 		extend = true;
 		break;
 	case BISHOP:
 		m_moveset.base = std::vector<glm::vec2>{
-			glm::vec2(1,1), glm::vec2(-1,1),
-			glm::vec2(-1,-1), glm::vec2(1,-1)
+			glm::vec2(1,1), glm::vec2(1,-1),
+			glm::vec2(-1,-1), glm::vec2(-1,1)
 		};
 		extend = true;
 		break;
 	case KNIGHT:
 		m_moveset.base = std::vector<glm::vec2>{
-			glm::vec2(1,2), glm::vec2(2,1), glm::vec2(-2,1), glm::vec2(-1,2),
-			glm::vec2(-1,-2), glm::vec2(-2,-1), glm::vec2(1,-2), glm::vec2(2,-1)
+			glm::vec2(2,1), glm::vec2(1,2), glm::vec2(1,-2), glm::vec2(2,-1),
+			glm::vec2(-2,-1), glm::vec2(-1,-2), glm::vec2(-2,1), glm::vec2(-1,2)
 		};
 		extend = false;
 		break;
 	case ROOK:
 		m_moveset.base = std::vector<glm::vec2>{
-			glm::vec2(1,0), glm::vec2(0,1),
-			glm::vec2(-1,0), glm::vec2(0,-1)
+			glm::vec2(0,1), glm::vec2(1,0),
+			glm::vec2(0,-1), glm::vec2(-1,0)
 		};
 		extend = true;
 		break;

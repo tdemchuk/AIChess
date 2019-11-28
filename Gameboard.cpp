@@ -308,7 +308,7 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 	}
 
 	if (isPawn) {	// Pawns can attack diagonally
-		glm::vec2 l_diag(-1 * orientation, 1 * orientation);
+		glm::vec2 l_diag(1 * orientation, -1 * orientation);
 		glm::vec2 r_diag(1 * orientation, 1 * orientation);
 		move.coord = piece.getPos() + l_diag;
 		atPos = check(move.coord);

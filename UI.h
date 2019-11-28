@@ -19,7 +19,7 @@ public:
 	virtual glm::vec2 promptMove(std::vector<Gameboard::Playable>& moves) = 0;
 
 	// Prompts the current player to choose what to promote a piece to 
-	virtual void promptPromote() = 0;
+	virtual Piece::Type promptPromote() = 0;
 
 	// Prompts the user to select a mode of play (2-Player vs 1P & AI --> Difficulty selection)
 	virtual void promptGameMode() = 0;

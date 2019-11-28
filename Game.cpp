@@ -80,9 +80,16 @@ void Game::play(UI* ui) {
 		// 6) Update Game State, Update UI
 			// TODO - update game state based on user selected move
 		captured = board.move(playables[input.x].piece,playables[input.x].moves[input.y]);
+		if (captured) players[curPlayer].capture(captured);	// Add captured piece [if there is one] to current players captured list
+
+		// 7) Handle Pawn Promotion
+		if (playables[input.x].piece->type() == Piece::Type::PAWN && playables[input.x].piece->canPromote()) {
+			playables[input.x].piece->promote(ui->promptPromote());
+		}
+
 		ui->drawBoard(board);
 
-		// 7) Swap Current Player and Repeat
+		// 8) Swap Current Player and Repeat
 		curPlayer = 1 - curPlayer;
 
 		//if (curPlayer == 0) done = true;		// DEBUG

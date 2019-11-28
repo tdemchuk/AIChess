@@ -113,7 +113,29 @@ glm::vec2 ConsoleUI::promptMove(std::vector<Gameboard::Playable>& moves)
 }
 
 // Prompts the current player to choose what to promote a piece to 
-void ConsoleUI::promptPromote() {}
+Piece::Type ConsoleUI::promptPromote() 
+{
+	// Local Vars
+	int input = 0;
+
+	std::cout << "\nWhat Do You Want to Promote This Pawn To? [Enter Index From Following List] :\n";
+	std::cout << "0 : Queen\n1 : Bishop\n2 : Knight\n3 : Rook\n";
+	
+	do {
+		if (input != 0) std::cout << "Invalid Input";
+		std::cout << "\n--> ";
+		std::cin >> input;
+		std::cout << "\n";
+	} while (input < 0 || input > 3);
+
+	switch (input) {
+	case 0: return Piece::Type::QUEEN;
+	case 1: return Piece::Type::BISHOP;
+	case 2: return Piece::Type::KNIGHT;
+	case 3: return Piece::Type::ROOK;
+	default: return Piece::Type::QUEEN;
+	}
+}
 
 // Prompts the user to select a mode of play (2-Player vs 1P & AI --> Difficulty selection)
 void ConsoleUI::promptGameMode() {}
