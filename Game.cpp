@@ -12,6 +12,8 @@ void Game::play(UI* ui) {
 	bool		done		= false;			// If Game has finished [win/loss/draw occurred]
 	std::vector<Gameboard::Playable> playables;	// List of moves current player can make
 	bool		inCheck		= false;			// If the current players King is in check at the start of their turn
+	glm::vec2	input;							// User Input 
+	Piece*		captured	= nullptr;			// captured piece placeholder
 
 	// 1) Init Players, Pieces
 	Player players[] = {Player(Color::WHITE), Player(Color::BLACK)};
@@ -56,8 +58,7 @@ void Game::play(UI* ui) {
 
 		// 2) Generate list of moves for current player
 		playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));		// TODO - debug write access violation error - nullptr issue
-		std::cout << "pieces with moves for player " << playables.size() <<'\n';
-
+		ui->drawBoard(board);
 		// 3) Test to see if king is in check
 		inCheck = board.isThreatened(*(kings[curPlayer]));
 
@@ -74,16 +75,17 @@ void Game::play(UI* ui) {
 		}
 
 		// 5) Prompt Current Player to make a move
-		ui->promptMove(playables);	// TODO - make function return user selected move
+		input = ui->promptMove(playables);	// TODO - make function return user selected move
 
 		// 6) Update Game State, Update UI
 			// TODO - update game state based on user selected move
+		captured = board.move(playables[input.x].piece,playables[input.x].moves[input.y]);
 		ui->drawBoard(board);
 
 		// 7) Swap Current Player and Repeat
 		curPlayer = 1 - curPlayer;
 
-		if (curPlayer == 0) done = true;		// DEBUG
-		done = true;
+		//if (curPlayer == 0) done = true;		// DEBUG
+		//done = true;
 	}
 }

@@ -11,7 +11,7 @@ public:
 	void drawBoard(const Gameboard& board) const override;
 
 	// Prompts the current player to make a move
-	void promptMove(std::vector<Gameboard::Playable>& moves) override;
+	glm::vec2 promptMove(std::vector<Gameboard::Playable>& moves) override;
 
 	// Prompts the current player to choose what to promote a piece to 
 	void promptPromote() override;

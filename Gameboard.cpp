@@ -88,6 +88,7 @@ Piece * Gameboard::move(Piece * piece, Move to)
 
 	int from = xytoi(piece->getPos());
 	Piece* captured = place(piece, to.coord);
+	m_board[from].set(nullptr);
 
 	last.captured = captured;
 	piece->setStatus(Piece::Status::NORMAL);					// Mark moved piece as dirty

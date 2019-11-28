@@ -16,7 +16,7 @@ public:
 	virtual void drawBoard(const Gameboard& board) const = 0;
 
 	// Prompts the current player to make a move
-	virtual void promptMove(std::vector<Gameboard::Playable>& moves) = 0;
+	virtual glm::vec2 promptMove(std::vector<Gameboard::Playable>& moves) = 0;
 
 	// Prompts the current player to choose what to promote a piece to 
 	virtual void promptPromote() = 0;
