@@ -78,7 +78,7 @@ void ConsoleUI::promptMove(std::vector<Gameboard::Playable>& moves)
 
 	for (int i = 0; i < moves.size(); i++) {
 		cur = moves[i].piece;
-		std::cout << i << " : " << cur->teamStr() << " " << cur->typeStr() << " at [" << cur->getPos().x << "," << cur->getPos().y << "]\n";
+		std::cout << i << " : " << cur->teamStr() << " " << cur->typeStr() << " at [" << cur->rank() << "," << cur->file() << "]\n";
 	}
 }
 

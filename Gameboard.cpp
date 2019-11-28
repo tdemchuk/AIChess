@@ -80,20 +80,22 @@ Piece * Gameboard::place(Piece * piece, char file, int rank)
 
 Piece * Gameboard::move(Piece * piece, Move to)
 {
-	int from = xytoi(piece->getPos());
-	Piece* captured = place(piece, to.coord);
-
 	// Backup to History Stack
 	Hist last;
-	last.captured = captured;
 	last.from = piece->getPos();
 	last.to = to.coord;
 	last.movedStatus = piece->getStatus();
-	if (captured) last.capturedStatus = captured->getStatus();
-	m_history.push(last);
 
+	int from = xytoi(piece->getPos());
+	Piece* captured = place(piece, to.coord);
+
+	last.captured = captured;
 	piece->setStatus(Piece::Status::NORMAL);					// Mark moved piece as dirty
-	if (captured) captured->setStatus(Piece::Status::CAPTURED);	// Mark captured piece as captured
+	if (captured) {
+		last.capturedStatus = captured->getStatus();
+		captured->setStatus(Piece::Status::CAPTURED);	// Mark captured piece as captured
+	}
+	m_history.push(last);
 	return captured;
 }
 
@@ -104,7 +106,7 @@ Piece * Gameboard::undo()
 	Hist last = m_history.top();
 	Piece* moved = nullptr;
 	int from = xytoi(last.from);
-	int to = xytoi(last.to);
+	int to = xytoi(last.to);	
 
 	// Revert moved piece
 	moved = m_board[to].get();
@@ -265,11 +267,29 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 			move.coord = checkpos;
 			std::cout << "Checking Pos [" << checkpos.x << "," << checkpos.y << "]\n";
 			if (atPos) {
+				if (atPos->team() != team) {
+					std::cout << "Enemy Piece Found at Position : ";
+					print(atPos);
+					std::cout << '\n';
+				}
+				else {
+					std::cout << "Friendly Piece Found at Position : ";
+					print(atPos);
+					std::cout << '\n';
+				}
 				extend = false;
-				if (!isPawn && atPos->team() != team) moves.push_back(move);
+				if (!isPawn && atPos->team() != team) {
+					std::cout << "Position Added To Move List\n";
+					moves.push_back(move);
+				}
 			}
 			else {
-				if (!isValidCoord(checkpos)) break;	// Out of bounds -> continue with next mapped
+				std::cout << "Position Free!\n";
+				if (!isValidCoord(checkpos)) {
+					std::cout << "Invalid Coord [Off Board]\n";
+					break;	// Out of bounds -> continue with next mapped
+				}
+				std::cout << "Position Added to move list\n";
 				moves.push_back(move);
 				if (isPawn && piece.getStatus() == Piece::Status::PRISTINE) {	// Pawns can "rush" on their first turn
 					move.coord.x += (moveset.base[i].x * orientation);
@@ -299,6 +319,12 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 		if (atPos) {
 			if (atPos->team() != team) moves.push_back(move);
 		}
+	}
+
+	// print moves list
+	std::cout << "Unsanitized Move List :\n";
+	for (int i = 0; i < moves.size(); i++) {
+		std::cout << "\t[" << moves[i].coord.x << "," << moves[i].coord.y << "]\n";
 	}
 
 	moves = sanitize(moves, piece, king);
@@ -334,10 +360,14 @@ std::vector<Gameboard::Move> Gameboard::sanitize(std::vector<Move>& moves, Piece
 {
 	std::vector<Move> safe;
 
+	std::cout << "Sanitizing Moves\n";
+
 	for (int i = 0; i < moves.size(); i++) {
 		// 1) Make Move
+		std::cout << "Before Move : "; print(&piece); std::cout << '\n';
 		move(&piece, moves[i]);
 
+		std::cout << "\tAfter Move : "; print(&piece); std::cout << '\n';
 		// 2) Check if move is safe
 		if (!isThreatened(king)) {
 			safe.push_back(moves[i]);
@@ -345,10 +375,11 @@ std::vector<Gameboard::Move> Gameboard::sanitize(std::vector<Move>& moves, Piece
 
 		// 3) Undo Move
 		undo();
+		std::cout << "\tAfter Undo : "; print(&piece); std::cout << '\n';
 	}
 
 	return safe;
-}
+} 
 
 int Gameboard::xytoi(glm::vec2 coord) const
 {

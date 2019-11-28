@@ -90,12 +90,12 @@ bool Piece::isOnBoard() const
 
 char Piece::file() const
 {
-	return m_pos.x + 97;	// Start at lowercase 'a'
+	return m_pos.y + 97;	// Start at lowercase 'a'
 }
 
 int Piece::rank() const
 {
-	return m_pos.y + 1;		// position is 0-indexed, add 1 to get proper rank
+	return m_pos.x + 1;		// position is 0-indexed, add 1 to get proper rank
 }
 
 glm::vec2 Piece::getPos() const

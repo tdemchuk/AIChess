@@ -23,7 +23,7 @@ void Game::play(UI* ui) {
 	players[0].create(Piece::Type::QUEEN, glm::vec2(0, 3), board);
 	kings[0] = players[0].create(Piece::Type::KING, glm::vec2(0, 4), board);
 	players[0].create(Piece::Type::BISHOP, glm::vec2(0, 5), board);
-	players[0].create(Piece::Type::KING, glm::vec2(0, 6), board);
+	players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 6), board);
 	players[0].create(Piece::Type::ROOK, glm::vec2(0, 7), board);
 	for (int i = 0; i < board.COL; i++) {
 		players[0].create(Piece::Type::PAWN, glm::vec2(1, i), board);
