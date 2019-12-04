@@ -140,6 +140,7 @@
     <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AI.cpp" />
     <ClCompile Include="ConsoleUI.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Gameboard.cpp" />

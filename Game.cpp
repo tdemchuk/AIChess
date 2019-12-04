@@ -1,6 +1,7 @@
 
 #include "Game.h"
 #include "Player.h"
+#include "AI.h" //Daniel Edit
 
 /* GAME CLASS DEFINITIONS */
 
@@ -8,6 +9,7 @@ void Game::play(UI* ui, Mode mode) {
 
 	// Local Vars
 	Gameboard	board;
+	AI*			ai;
 	int			curPlayer	= 0;				// current player in game
 	bool		done		= false;			// If Game has finished [win/loss/draw occurred]
 	std::vector<Gameboard::Playable> playables;	// List of moves current player can make
@@ -45,6 +47,14 @@ void Game::play(UI* ui, Mode mode) {
 	}
 
 	ui->drawBoard(board);
+	
+	// Daniel Edit - Initialize AI here
+	if (aiEnabled) {
+
+		//TODO - Integrate Mode into the constructor
+		ai = new AI(0);
+
+	}
 
 	// Print all pieces owned by current player - DEBUG ONLY
 #ifdef DEBUG
@@ -57,26 +67,42 @@ void Game::play(UI* ui, Mode mode) {
 	// Begin Game Loop
 	while (!done) {
 
-		// 2) Generate list of moves for current player
-		playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));		// TODO - debug write access violation error - nullptr issue
-		ui->drawBoard(board);
-		// 3) Test to see if king is in check
-		inCheck = board.isThreatened(*(kings[curPlayer]));
 
-		// 4) Check end conditions
-		if (playables.size() == 0) {
-			if (inCheck) {	// Other player won
-				ui->drawMessage("Player __ Won!");	// TODO - make non-current player number print here
-			}
-			else {			// draw
-				ui->drawMessage("Draw!");
-			}
-			done = true;
-			continue;
+		// Daniel Edit - Check if it's the AI's turn
+		if (aiEnabled && curPlayer == 1) {
+
+			//Perform AB Prune if so
+			input = ai->ABPrune(board, *players, *kings, 0, 0);
+
 		}
-			
-		// 5) Prompt Current Player to make a move
-		input = ui->promptMove(playables);	// TODO - make function return user selected move
+
+		// Daniel Edit - Human Player Turn
+
+		else {
+			// 2) Generate list of moves for current player
+			playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));		// TODO - debug write access violation error - nullptr issue
+			ui->drawBoard(board);
+			// 3) Test to see if king is in check
+			inCheck = board.isThreatened(*(kings[curPlayer]));
+
+			// 4) Check end conditions
+			if (playables.size() == 0) {
+				if (inCheck) {	// Other player won
+					ui->drawMessage("Player __ Won!");	// TODO - make non-current player number print here
+				}
+				else {			// draw
+					ui->drawMessage("Draw!");
+				}
+				done = true;
+				continue;
+			}
+
+			// 5) Prompt Current Player to make a move
+			input = ui->promptMove(playables);	// TODO - make function return user selected move
+		}
+
+
+		// Daniel Edit - After AI or Human Player's Turn
 
 		// 6) Update Game State, Update UI
 			// TODO - update game state based on user selected move
