@@ -58,7 +58,7 @@ void Game::play(UI* ui, Mode mode) {
 	while (!done) {
 
 		// 2) Generate list of moves for current player
-		playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));		// TODO - debug write access violation error - nullptr issue
+		playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));
 		ui->drawBoard(board);
 		// 3) Test to see if king is in check
 		inCheck = board.isThreatened(*(kings[curPlayer]));

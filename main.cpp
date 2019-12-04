@@ -1,6 +1,6 @@
 
 //#define GUI_ON		// Uncomment to use experimental GUI. Otherwise console-based UI will be used
-#define DEBUG			// Uncomment to enable printing out of extra debug information
+
 
 #include "Game.h"
 #include "Gameboard.h"
