@@ -141,14 +141,14 @@ Piece::Type ConsoleUI::promptPromote()
 Mode ConsoleUI::promptGameMode() 
 {
 	// Local Vars
-	int input = 0;
+	int input = 1;
 	Mode mode;
 	
 	std::cout << "\nSelect The Number Of Players: \n";
 	std::cout << "1 : 1 Player\n2 : 2 Player\n";
 
 	do {
-		if (input != 0) std::cout << "Invalid Input";
+		if (input != 1) std::cout << "Invalid Input";
 		std::cout << "\n--> ";
 		std::cin >> input;
 		std::cout << "\n";
