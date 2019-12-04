@@ -253,6 +253,7 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 	glm::vec2 checkpos;
 	bool extend;
 	const bool isPawn = (piece.type() == Piece::Type::PAWN ? true : false);
+	const bool isKing = (piece.type() == Piece::Type::KING ? true : false);
 
 #ifdef DEBUG
 	std::cout << "Piece is Pawn? : " << isPawn << '\n';
@@ -352,6 +353,23 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 		atPos = check(move.coord);
 		if (atPos) {
 			if (atPos->team() != team) moves.push_back(move);
+		}
+	}
+
+	// Check for Castling
+	if (isKing && king.getStatus() == Piece::Status::PRISTINE) {
+		bool good = true;
+		glm::vec2 l(0, -1);
+		glm::vec2 r(0, 1);
+		checkpos = king.getPos() + r;
+		atPos = nullptr;
+
+		// 1) Check Kingside Rook
+		while (checkpos.y < COL - 1) {
+			atPos = check(checkpos);
+			if (checkpos.y == COL - 1 && check(checkpos)->type() == Piece::Type::ROOK) {	// edge of board and rook is present
+				if ()
+			}
 		}
 	}
 

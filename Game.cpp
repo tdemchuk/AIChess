@@ -24,7 +24,7 @@ void Game::play(UI* ui, Mode mode) {
 	players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 1), board);
 	players[0].create(Piece::Type::BISHOP, glm::vec2(0, 2), board);
 	players[0].create(Piece::Type::QUEEN, glm::vec2(0, 3), board);
-	kings[0] = players[0].create(Piece::Type::KING, glm::vec2(0, 4), board);
+	kings[0] = players[0].create(Piece::Type::KING, glm::vec2(0, 4), board);		// store created king
 	players[0].create(Piece::Type::BISHOP, glm::vec2(0, 5), board);
 	players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 6), board);
 	players[0].create(Piece::Type::ROOK, glm::vec2(0, 7), board);
@@ -36,7 +36,7 @@ void Game::play(UI* ui, Mode mode) {
 	players[1].create(Piece::Type::KNIGHT, glm::vec2(7 ,1), board);
 	players[1].create(Piece::Type::BISHOP, glm::vec2(7, 2), board);
 	players[1].create(Piece::Type::QUEEN, glm::vec2(7, 3), board);
-	kings[1] = players[1].create(Piece::Type::KING, glm::vec2(7, 4), board);
+	kings[1] = players[1].create(Piece::Type::KING, glm::vec2(7, 4), board);		// store created king
 	players[1].create(Piece::Type::BISHOP, glm::vec2(7, 5), board);
 	players[1].create(Piece::Type::KNIGHT, glm::vec2(7, 6), board);
 	players[1].create(Piece::Type::ROOK, glm::vec2(7, 7), board);
