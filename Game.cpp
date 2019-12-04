@@ -4,7 +4,7 @@
 
 /* GAME CLASS DEFINITIONS */
 
-void Game::play(UI* ui) {
+void Game::play(UI* ui, Mode mode) {
 
 	// Local Vars
 	Gameboard	board;
@@ -14,6 +14,7 @@ void Game::play(UI* ui) {
 	bool		inCheck		= false;			// If the current players King is in check at the start of their turn
 	glm::vec2	input;							// User Input 
 	Piece*		captured	= nullptr;			// captured piece placeholder
+	bool		aiEnabled	= mode.numPlayers == 1 ? true : false;		// if the AI is standing in for player 2 or not
 
 	// 1) Init Players, Pieces
 	Player players[] = {Player(Color::WHITE), Player(Color::BLACK)};
@@ -73,7 +74,7 @@ void Game::play(UI* ui) {
 			done = true;
 			continue;
 		}
-
+			
 		// 5) Prompt Current Player to make a move
 		input = ui->promptMove(playables);	// TODO - make function return user selected move
 

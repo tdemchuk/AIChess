@@ -14,7 +14,7 @@ class Game
 {
 public:
 
-	void play(UI* ui);	// start a new game
+	void play(UI* ui, Mode mode);	// start a new game
 
 private:
 
