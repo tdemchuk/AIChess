@@ -39,7 +39,7 @@
     <ClInclude Include="ConsoleUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AI.h">
+    <ClInclude Include="Gamemode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

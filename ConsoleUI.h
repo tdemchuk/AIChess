@@ -1,7 +1,7 @@
 #ifndef CONSOLE_UI_H
 #define CONSOLE_UI_H
 
-#include "UI.h" 
+#include "UI.h"
 
 
 class ConsoleUI : public UI
@@ -17,7 +17,7 @@ public:
 	Piece::Type promptPromote() override;
 
 	// Prompts the user to select a mode of play (2-Player vs 1P & AI --> Difficulty selection)
-	void promptGameMode() override;
+	Mode promptGameMode() override;
 
 	// Draws the provided message string to the screen (use for win/loss/draw messages)
 	void drawMessage(std::string msg) override;

@@ -138,7 +138,43 @@ Piece::Type ConsoleUI::promptPromote()
 }
 
 // Prompts the user to select a mode of play (2-Player vs 1P & AI --> Difficulty selection)
-void ConsoleUI::promptGameMode() {}
+Mode ConsoleUI::promptGameMode() 
+{
+	// Local Vars
+	int input = 1;
+	Mode mode;
+	
+	std::cout << "\nSelect The Number Of Players: \n";
+	std::cout << "1 : 1 Player\n2 : 2 Player\n";
+
+	do {
+		if (input != 1) std::cout << "Invalid Input";
+		std::cout << "\n--> ";
+		std::cin >> input;
+		std::cout << "\n";
+	} while (input < 1 || input > 2);
+
+	mode.numPlayers = input;
+
+	if (input == 2) return mode;	// two player mode doesnt require a difficulty specification
+
+	// TODO : Make prompt for difficulty when playing against AI
+	std::cout << "Select AI Difficulty [Enter Difficulty From Following List] :\n";
+	std::cout << "0 : EASY\n1 : MEDIUM\n2 : HARD\n";
+
+	input = 0;
+
+	do {
+		if (input != 0) std::cout << "Invalid Input";
+		std::cout << "\n--> ";
+		std::cin >> input;
+		std::cout << "\n";
+	} while (input < 0 || input > 2);
+
+	mode.diff = (Difficulty)input;
+
+	return mode;
+}
 
 // Draws the provided message string to the screen (use for win/loss/draw messages)
 void ConsoleUI::drawMessage(std::string msg) {}

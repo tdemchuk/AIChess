@@ -3,6 +3,7 @@
 
 
 #include "Gameboard.h"
+#include "Gamemode.h"
 
 /*
 	UI Superclass - declares function prototypes used to interact with the user 
@@ -22,7 +23,7 @@ public:
 	virtual Piece::Type promptPromote() = 0;
 
 	// Prompts the user to select a mode of play (2-Player vs 1P & AI --> Difficulty selection)
-	virtual void promptGameMode() = 0;
+	virtual Mode promptGameMode() = 0;
 
 	// Draws the provided message string to the screen (use for win/loss/draw messages)
 	virtual void drawMessage(std::string msg) = 0;
