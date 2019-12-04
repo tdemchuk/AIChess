@@ -7,15 +7,24 @@
 #include <iostream>
 
 /*
-	Class that provides function to play a Game of chess
+	Class that provides function to intialize a Chess AI
 */
 class AI
 {
 public:
 
-	void makeMove(std::vector<Gameboard::Playable> AIplayables);
+	AI() = delete;
+	AI(int ply);
+	~AI() = default;
+
+	const int Ply() const;																						//return the AI's Ply
+	glm::vec2 ABPrune(Gameboard& board, Player& players, Piece* kings, int currentPlayer, int depth);			//Perform AB Prune based off current board state
+	int EvalHeuristic(Gameboard& board);																		//Evaluate the Heuristic score of a given gameBoard
 
 
+
+private:
+	const int m_Ply;
 };
 
 #endif
