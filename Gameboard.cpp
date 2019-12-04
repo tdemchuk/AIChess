@@ -2,6 +2,9 @@
 #include "Gameboard.h"
 #include <iostream>
 
+#define DEBUG		// Uncomment to enable printing out of extra debug information
+
+
 /* CELL CLASS DEFINITIONS */
 
 Cell::Cell(Color& c)
@@ -133,16 +136,22 @@ std::vector<Gameboard::Playable> Gameboard::genPlayables(std::vector<Piece*>& ow
 	std::vector<Playable> options;	// Options the player has this turn
 
 	for (int i = 0; i < owned.size(); i++) {
+#ifdef DEBUG
 		std::cout << "Processing ";
 		print(owned[i]);
 		std::cout << '\n';
+#endif
 		// Cull pieces that are off the board
 		if (owned[i]->isOnBoard()) {
+#ifdef DEBUG
 			std::cout << "Piece on board. Generating Moves:\n";
+#endif
 			moves = generateMoves(*(owned[i]), king);	// Generate moves for this piece
+#ifdef DEBUG		
 			std::cout << "Piece ";
 			print(owned[i]);
 			std::cout << " Has " << moves.size() << " Generated Moves\n\n";
+#endif
 			if (moves.size() > 0) {
 				// If piece has moves to make, wrap in Option and add to list
 				op.piece = owned[i];
@@ -245,52 +254,76 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 	bool extend;
 	const bool isPawn = (piece.type() == Piece::Type::PAWN ? true : false);
 
+#ifdef DEBUG
 	std::cout << "Piece is Pawn? : " << isPawn << '\n';
 	std::cout << "Moveset is Extendable? : " << moveset.extendable << '\n';
 	std::cout << "Orientation : " << piece.orientation() <<'\n';
 	std::cout << "Mapping Pieces Base Moveset Vectors :\n";
+#endif
 
 	mapped = mapBase(piece);
 
+#ifdef DEBUG
 	std::cout << "Processing Mapped Vectors:\n";
+#endif
 	for (int i = 0; i < mapped.size(); i++) {
+#ifdef DEBUG
 		std::cout << "Mapped [" << mapped[i].x << "," << mapped[i].y << "]";
+#endif
 		if (!isValidCoord(mapped[i])) {
+#ifdef DEBUG
 			std::cout << " : Invalid Coord [Off Board]\n";
+#endif
 			continue;	// if mapped is off board, continue with next mapped coord
 		}
+#ifdef DEBUG
 		std::cout << '\n';
+#endif
 		checkpos = mapped[i];
 		atPos = check(checkpos);
 		extend = moveset.extendable;
 
 		do {
 			move.coord = checkpos;
+#ifdef DEBUG
 			std::cout << "Checking Pos [" << checkpos.x << "," << checkpos.y << "]\n";
+#endif
 			if (atPos) {
 				if (atPos->team() != team) {
+#ifdef DEBUG
 					std::cout << "Enemy Piece Found at Position : ";
 					print(atPos);
 					std::cout << '\n';
+#endif
 				}
 				else {
+#ifdef DEBUG
 					std::cout << "Friendly Piece Found at Position : ";
 					print(atPos);
 					std::cout << '\n';
+#endif
 				}
 				extend = false;
 				if (!isPawn && atPos->team() != team) {
+#ifdef DEBUG
 					std::cout << "Position Added To Move List\n";
+#endif
 					moves.push_back(move);
 				}
 			}
 			else {
+#ifdef DEBUG
 				std::cout << "Position Free!\n";
+#endif
 				if (!isValidCoord(checkpos)) {
+#ifdef DEBUG
 					std::cout << "Invalid Coord [Off Board]\n";
+#endif
 					break;	// Out of bounds -> continue with next mapped
 				}
+#ifdef DEBUG
 				std::cout << "Position Added to move list\n";
+#endif
 				moves.push_back(move);
 				if (isPawn && piece.getStatus() == Piece::Status::PRISTINE) {	// Pawns can "rush" on their first turn
 					move.coord.x += (moveset.base[i].x * orientation);
@@ -323,10 +356,12 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 	}
 
 	// print moves list
+#ifdef DEBUG
 	std::cout << "Unsanitized Move List :\n";
 	for (int i = 0; i < moves.size(); i++) {
 		std::cout << "\t[" << moves[i].coord.x << "," << moves[i].coord.y << "]\n";
 	}
+#endif
 
 	moves = sanitize(moves, piece, king);
 
@@ -348,7 +383,9 @@ std::vector<glm::vec2> Gameboard::mapBase(Piece & piece)
 		map.x = map.x + piece.getPos().x;
 		map.y = map.y + piece.getPos().y;
 		mapped.push_back(map);
+#ifdef DEBUG
 		std::cout << "Base [" << base[i].x << "," << base[i].y << "] Mapped to [" << map.x << "," << map.y << "]\n";
+#endif
 	}
 
 	return mapped;
@@ -360,15 +397,19 @@ std::vector<glm::vec2> Gameboard::mapBase(Piece & piece)
 std::vector<Gameboard::Move> Gameboard::sanitize(std::vector<Move>& moves, Piece& piece, Piece& king)
 {
 	std::vector<Move> safe;
-
+#ifdef DEBUG
 	std::cout << "Sanitizing Moves\n";
+#endif
 
 	for (int i = 0; i < moves.size(); i++) {
 		// 1) Make Move
+#ifdef DEBUG
 		std::cout << "Before Move : "; print(&piece); std::cout << '\n';
+#endif
 		move(&piece, moves[i]);
-
+#ifdef DEBUG
 		std::cout << "\tAfter Move : "; print(&piece); std::cout << '\n';
+#endif
 		// 2) Check if move is safe
 		if (!isThreatened(king)) {
 			safe.push_back(moves[i]);
@@ -376,7 +417,9 @@ std::vector<Gameboard::Move> Gameboard::sanitize(std::vector<Move>& moves, Piece
 
 		// 3) Undo Move
 		undo();
+#ifdef DEBUG
 		std::cout << "\tAfter Undo : "; print(&piece); std::cout << '\n';
+#endif
 	}
 
 	return safe;
