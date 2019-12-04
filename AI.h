@@ -1,6 +1,8 @@
 #ifndef AI_H
 #define AI_H
 
+#include "Game.h"
+#include "Player.h"
 #include <vector>
 #include <iostream>
 
@@ -11,7 +13,7 @@ class AI
 {
 public:
 
-	std::vector makeMove()
+	void makeMove(std::vector<Gameboard::Playable> AIplayables);
 
 
 };
