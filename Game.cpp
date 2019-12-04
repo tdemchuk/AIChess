@@ -122,4 +122,7 @@ void Game::play(UI* ui, Mode mode) {
 		//if (curPlayer == 0) done = true;		// DEBUG
 		//done = true;
 	}
+
+	// Cleanup
+	if (aiEnabled) delete ai;
 }
