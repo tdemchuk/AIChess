@@ -357,6 +357,7 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 	}
 
 	// Check for Castling
+	/*
 	if (isKing && king.getStatus() == Piece::Status::PRISTINE) {
 		bool good = true;
 		glm::vec2 l(0, -1);
@@ -371,7 +372,7 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 				if ()
 			}
 		}
-	}
+	}*/
 
 	// print moves list
 #ifdef DEBUG
