@@ -9,7 +9,7 @@ void Game::play(UI* ui, Mode mode) {
 
 	// Local Vars
 	Gameboard	board;
-	AI*			ai;
+	AI*			ai			= nullptr;
 	int			curPlayer	= 0;				// current player in game
 	bool		done		= false;			// If Game has finished [win/loss/draw occurred]
 	std::vector<Gameboard::Playable> playables;	// List of moves current player can make
@@ -52,7 +52,7 @@ void Game::play(UI* ui, Mode mode) {
 	if (aiEnabled) {
 
 		//TODO - Integrate Mode into the constructor
-		ai = new AI(0);
+		ai = new AI(2);
 
 	}
 
@@ -72,7 +72,13 @@ void Game::play(UI* ui, Mode mode) {
 		if (aiEnabled && curPlayer == 1) {
 
 			//Perform AB Prune if so
-			input = ai->ABPrune(board, *players, *kings, 0, 0);
+			input = ai->ABPrune(board, players, kings, INT_MIN, INT_MAX, curPlayer, 0);
+
+			//Generate playables for AI
+			playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));
+
+			std::cout << "\n Piece chosen: " << input[0];
+			std::cout << "\n Move chosen: " << input[1] << "\n";
 
 		}
 
