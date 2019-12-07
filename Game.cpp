@@ -123,6 +123,9 @@ void Game::play(UI* ui, Mode mode) {
 
 		// 7) Handle Pawn Promotion
 		if (playables[input.x].piece->type() == Piece::Type::PAWN && playables[input.x].piece->canPromote()) {
+			if (aiEnabled && curPlayer == 1) {
+				playables[input.x].piece->promote(Piece::Type::QUEEN);
+			}
 			playables[input.x].piece->promote(ui->promptPromote());
 		}
 
