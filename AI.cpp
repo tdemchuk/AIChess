@@ -12,7 +12,7 @@ const int AI::Ply() const
 	return m_Ply;
 }
 
-glm::vec2 AI::ABPrune(Gameboard& board, Player& players, Piece* kings, int curPlayer, int depth)
+glm::vec2 AI::ABPrune(Gameboard& board, Player (&players)[2], Piece* (&kings)[2], int curPlayer, int depth)
 {
 	glm::vec2 score;
 	score.x = 0;
@@ -26,20 +26,20 @@ glm::vec2 AI::ABPrune(Gameboard& board, Player& players, Piece* kings, int curPl
 	//Base case: depth = ply
 	if (depth == m_Ply) {
 	
-		score.x = EvalHeurisitc(board);
+		score.x = EvalHeuristic(board);
 		return score;
 	
 	}
 
 	//Generate available moves for the current player
-	std::vector<Gameboard::Playable> playables = board.genPlayables(players[curPlayer].getOwned(), kings[curPlayer]);
+	std::vector<Gameboard::Playable> playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));
 
 
 
 	return score;
 }
 
-int EvalHeurisitc(Gameboard& board) {
+int AI::EvalHeuristic(Gameboard& board) {
 
 	return 1;
 

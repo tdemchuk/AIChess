@@ -83,14 +83,55 @@ Piece * Gameboard::place(Piece * piece, char file, int rank)
 
 Piece * Gameboard::move(Piece * piece, Move to)
 {
-	// Backup to History Stack
+	// Local Vars
 	Hist last;
+	int from;
+	Piece* captured = nullptr;
+
+	// Handle Castling Move
+	if (to.special && piece->type() == Piece::Type::KING) {		// Castling Move
+		Piece* rook = nullptr;
+		glm::vec2 kingpos = piece->getPos();
+		glm::vec2 rook_to(kingpos.x,-1);
+		if (kingpos.y < to.coord.y) {		// Kingside castling
+			rook = check(glm::vec2(kingpos.x,7));
+			rook_to.y = to.coord.y - 1;
+		}	
+		else if (kingpos.y > to.coord.y) {	// Queenside Castling
+			rook = check(glm::vec2(kingpos.x,0));
+			rook_to.y = to.coord.y + 1;
+		}
+		last.special = false;
+		last.from = rook->getPos();
+		last.to = rook_to;
+		last.movedStatus = rook->getStatus();
+		from = xytoi(rook->getPos());
+		captured = place(rook, rook_to);
+		m_board[from].set(nullptr);
+		last.captured = captured;
+		rook->setStatus(Piece::Status::NORMAL);
+		if (captured) {
+			last.capturedStatus = captured->getStatus();
+			captured->setStatus(Piece::Status::CAPTURED);	// Mark captured piece as captured
+		}
+		m_history.push(last);
+	}
+
+	bool enPassant = to.special && piece->type() == Piece::Type::KING ? true : false;
+
+	// Backup to History Stack
+	last.special = to.special;
 	last.from = piece->getPos();
 	last.to = to.coord;
 	last.movedStatus = piece->getStatus();
 
-	int from = xytoi(piece->getPos());
-	Piece* captured = place(piece, to.coord);
+	from = xytoi(piece->getPos());
+	captured = place(piece, to.coord);	
+	if (enPassant) {	// Handle En Passant Move
+		glm::vec2 capLoc = to.coord - glm::vec2(piece->orientation(),0);
+		captured = check(capLoc);
+		m_board[xytoi(capLoc)].set(nullptr);
+	}
 	m_board[from].set(nullptr);
 
 	last.captured = captured;
@@ -111,21 +152,32 @@ Piece * Gameboard::undo()
 	Piece* moved = nullptr;
 	int from = xytoi(last.from);
 	int to = xytoi(last.to);	
-
+	 
 	// Revert moved piece
 	moved = m_board[to].get();
 	moved->setPos(last.from.x, last.from.y);		
 	moved->setStatus(last.movedStatus);	
 	m_board[from].set(moved);
 
+	bool enPassant = last.special && moved->type() == Piece::Type::PAWN ? true : false;
+
 	// Revert captured
 	if (last.captured) {
-		last.captured->setPos(last.to.x, last.to.y);
+		if (enPassant) {
+			last.captured->setPos(last.to.x - moved->orientation(), last.to.y);
+		}
+		else last.captured->setPos(last.to.x, last.to.y);
 		last.captured->setStatus(last.capturedStatus);
 	}
-	m_board[to].set(last.captured);			
+	if (enPassant) {
+		glm::vec2 capLoc = last.to - glm::vec2(moved->orientation(), 0);
+		m_board[xytoi(capLoc)].set(last.captured);
+		m_board[to].set(nullptr);
+	}
+	else m_board[to].set(last.captured);			
 
 	m_history.pop();		// pop from stack
+	if (last.special && moved->type() == Piece::Type::KING) undo();	// Castling move -> composite move requiring an additional undo
 	return last.captured;	// return captured 
 }
 
@@ -246,7 +298,7 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 	Move move;
 	std::vector<Move> moves;
 	std::vector<glm::vec2> mapped;	// Mapped base vectors for a single piece 
-	Piece::Moveset moveset = piece.moveset();
+	Piece::Moveset moveset = piece.moveset();	
 	int orientation = piece.orientation();
 	Color team = piece.team();
 	Piece* atPos = nullptr;
@@ -254,6 +306,8 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 	bool extend;
 	const bool isPawn = (piece.type() == Piece::Type::PAWN ? true : false);
 	const bool isKing = (piece.type() == Piece::Type::KING ? true : false);
+	Hist last;
+
 
 #ifdef DEBUG
 	std::cout << "Piece is Pawn? : " << isPawn << '\n';
@@ -262,6 +316,7 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 	std::cout << "Mapping Pieces Base Moveset Vectors :\n";
 #endif
 
+	move.special = false;
 	mapped = mapBase(piece);
 
 #ifdef DEBUG
@@ -341,38 +396,94 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 		} while (extend);	// Extend along direction of extendable
 	}
 
-	if (isPawn) {	// Pawns can attack diagonally
+	// Handle Pawn Attack & En Passant 
+	if (isPawn) {	
+		bool firstTurn = m_history.empty();
+		if (!firstTurn) last = m_history.top();
+		int x_req = 3 + ((orientation + 1) / 2);
 		glm::vec2 l_diag(1 * orientation, -1 * orientation);
 		glm::vec2 r_diag(1 * orientation, 1 * orientation);
+		move.special = false;
 		move.coord = piece.getPos() + l_diag;
 		atPos = check(move.coord);
 		if (atPos) {
 			if (atPos->team() != team) moves.push_back(move);
 		}
+		else if (piece.getPos().x == x_req && !firstTurn) {	// check en passant
+			atPos = check(last.to);
+			if (atPos) {
+				if (atPos->type() == Piece::Type::PAWN && abs(last.to.x - last.from.x) > 1 && last.to.y == move.coord.y) {	// if opponent moved a pawn 2 spaces last turn in an adjacent file
+					move.special = true;
+					moves.push_back(move);
+				}
+			}
+		}
+		move.special = false;
 		move.coord = piece.getPos() + r_diag;
 		atPos = check(move.coord);
 		if (atPos) {
 			if (atPos->team() != team) moves.push_back(move);
 		}
+		else if (piece.getPos().x == x_req && !firstTurn) {	// check en passant
+			atPos = check(last.to);
+			if (atPos) {
+				if (atPos->type() == Piece::Type::PAWN && abs(last.to.x - last.from.x) > 1 && last.to.y == move.coord.y) {	// if opponent moved a pawn 2 spaces last turn in an adjacent file
+					move.special = true;
+					moves.push_back(move);
+				}
+			}
+		}
+		move.special = false;
 	}
 
 	// Check for Castling
-	/*
-	if (isKing && king.getStatus() == Piece::Status::PRISTINE) {
-		bool good = true;
-		glm::vec2 l(0, -1);
-		glm::vec2 r(0, 1);
-		checkpos = king.getPos() + r;
-		atPos = nullptr;
+	if (isKing && king.getStatus() == Piece::Status::PRISTINE) {	// King hasn 't been moved and is not in check
+		
+		int x = king.getPos().x;
+		std::vector<Move> temp;
 
-		// 1) Check Kingside Rook
-		while (checkpos.y < COL - 1) {
-			atPos = check(checkpos);
-			if (checkpos.y == COL - 1 && check(checkpos)->type() == Piece::Type::ROOK) {	// edge of board and rook is present
-				if ()
+		// Check Kingside
+		atPos = check(glm::vec2(x, 7));
+		if (atPos) {
+			if (atPos->type() == Piece::Type::ROOK && atPos->getStatus() == Piece::Status::PRISTINE) {	// Rook is in place and untouched
+				if (!check(glm::vec2(x, 5)) && !check(glm::vec2(x, 6))) {		// Intermediary Cells are empty 
+					// Ensure Passing Through [x,5] doesnt place king in check
+					move.coord.x = x;
+					move.coord.y = 5;
+					move.special = false;
+					temp.push_back(move);
+					temp = sanitize(temp, piece, king);
+					if (temp.size() > 0) {
+						move.coord.x = x;
+						move.coord.y = 6;
+						move.special = true;
+						moves.push_back(move);
+					}
+				}
 			}
 		}
-	}*/
+
+		// Check Queenside
+		atPos = check(glm::vec2(x, 0));
+		if (atPos) {
+			if (atPos->type() == Piece::Type::ROOK && atPos->getStatus() == Piece::Status::PRISTINE) {	// Rook is in place and untouched
+				if (!check(glm::vec2(x, 1)) && !check(glm::vec2(x, 2)) && !check(glm::vec2(x,3))) {		// Intermediary Cells are empty 
+					// Ensure Passing Through [x,3] doesnt place king in check
+					move.coord.x = x;
+					move.coord.y = 3;
+					move.special = false;
+					temp.push_back(move);
+					temp = sanitize(temp, piece, king);
+					if (temp.size() > 0) {
+						move.coord.x = x;
+						move.coord.y = 2;
+						move.special = true;
+						moves.push_back(move);
+					}
+				}
+			}
+		}
+	}
 
 	// print moves list
 #ifdef DEBUG

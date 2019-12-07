@@ -18,7 +18,7 @@ public:
 	~AI() = default;
 
 	const int Ply() const;																						//return the AI's Ply
-	glm::vec2 ABPrune(Gameboard& board, Player& players, Piece* kings, int currentPlayer, int depth);			//Perform AB Prune based off current board state
+	glm::vec2 ABPrune(Gameboard& board, Player (&players)[2], Piece* (&kings)[2], int currentPlayer, int depth);			//Perform AB Prune based off current board state
 	int EvalHeuristic(Gameboard& board);																		//Evaluate the Heuristic score of a given gameBoard
 
 

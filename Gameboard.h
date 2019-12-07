@@ -32,6 +32,7 @@ class Gameboard
 public:
 	struct Move {
 		glm::vec2 coord;
+		bool special = false;		
 	};
 
 	struct Playable {
@@ -40,6 +41,7 @@ public:
 	};
 
 	struct Hist {
+		bool special;
 		glm::vec2 from;				
 		glm::vec2 to;
 		Piece* captured;
