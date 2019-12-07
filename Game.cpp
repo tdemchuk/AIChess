@@ -52,7 +52,7 @@ void Game::play(UI* ui, Mode mode) {
 	if (aiEnabled) {
 
 		//TODO - Integrate Mode into the constructor
-		ai = new AI(2);
+		ai = new AI(3);
 
 	}
 
@@ -117,7 +117,12 @@ void Game::play(UI* ui, Mode mode) {
 
 		// 7) Handle Pawn Promotion
 		if (playables[input.x].piece->type() == Piece::Type::PAWN && playables[input.x].piece->canPromote()) {
-			playables[input.x].piece->promote(ui->promptPromote());
+			if (aiEnabled && curPlayer == 1) {
+				playables[input.x].piece->promote(Piece::Type::QUEEN);
+			}
+			else {
+				playables[input.x].piece->promote(ui->promptPromote());
+			}
 		}
 
 		ui->drawBoard(board);

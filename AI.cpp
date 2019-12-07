@@ -24,32 +24,15 @@ glm::vec2 AI::ABPrune(Gameboard& board, Player (&players)[2], Piece* (&kings)[2]
 	else {
 		localbestScore.x = INT_MAX;
 	}
-	bool inCheck = false;
 
 	//Base case: depth = ply
 	if (depth == m_Ply) {
-		score.x = EvalHeuristic(board);
+		score.x = EvalHeuristic(board, players, kings);
 		return score;
 	}
 
 	//Generate available moves for the current player
 	std::vector<Gameboard::Playable> playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));
-
-	//Test for current player to be in Check
-	inCheck = board.isThreatened(*(kings[curPlayer]));
-
-	//Immediately return end board states
-	if (playables.size() == 0) {
-		if (inCheck) {
-			if (curPlayer) score.x = INT_MAX; //Curplayer 1 is human, 0 moves available means AI wins
-			else score.x = INT_MIN; //Curplayer 0 is AI, 0 moves available means human wins
-		}
-		else {
-			score.x = 0; //Draws are neutral and do not impact decisions
-		}
-
-		return score;
-	}
 
 	//Iterate through each move
 	for (int i = 0; i < playables.size(); i++) {
@@ -59,19 +42,17 @@ glm::vec2 AI::ABPrune(Gameboard& board, Player (&players)[2], Piece* (&kings)[2]
 			//Make move and push to history stack [so it can be undone]
 			board.move(playables[i].piece, playables[i].moves[j]);
 
-			//Tests for returning the proper value according to minmax (proves ply 1 and 2 work)
-
 			score = ABPrune(board, players, kings, curAlpha, curBeta, 1 - curPlayer, depth + 1);
 			
 
-			/*if (score.x == localbestScore.x) {
-				if (rand() % playables.size() == 1) { //Randomly decides on moves that are equally as good
+			if (score.x == localbestScore.x) {
+				if (rand() % 2 == 1) { //Randomly decides on moves that are equally as good
 
 					bestMove.x = i;
 					bestMove.y = j;
 
 				}
-			}*/
+			}
 			if (minmax == 1) { //Maximize Scores
 				if (score.x > localbestScore.x) {
 					localbestScore.x = score.x;
@@ -118,8 +99,55 @@ glm::vec2 AI::ABPrune(Gameboard& board, Player (&players)[2], Piece* (&kings)[2]
 	else return localbestScore;
 }
 
-int AI::EvalHeuristic(Gameboard& board) {
+int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2]) {
 
-	return 10;
+	int heurValue = 0;
+	std::vector<Piece*> whiteOwned = players[0].getOwned();
+	std::vector<Piece*> blackOwned = players[1].getOwned();
+
+	//0 is human player
+	//1 is AI player
+
+	//Apply for each player to be in Check
+	if (board.isThreatened(*(kings[0]))) heurValue += 450;
+	if (board.isThreatened(*(kings[1]))) heurValue -= 450;
+
+	//Apply piece values to heuristic
+	for (int i = 0; i < whiteOwned.size(); i++) {
+
+		if (blackOwned[i]->getStatus() != Piece::Status::CAPTURED) {
+
+			switch (blackOwned[i]->type()) {
+
+				case Piece::Type::KING: heurValue += 900;
+				case Piece::Type::QUEEN: heurValue += 90;
+				case Piece::Type::ROOK: heurValue += 50;
+				case Piece::Type::BISHOP: heurValue += 30;
+				case Piece::Type::KNIGHT: heurValue += 30;
+				case Piece::Type::PAWN: heurValue += 10;
+
+			}
+
+		}
+
+		if (whiteOwned[i]->getStatus() != Piece::Status::CAPTURED) {
+
+			switch (whiteOwned[i]->type()) {
+
+				case Piece::Type::KING: heurValue -= 900;
+				case Piece::Type::QUEEN: heurValue -= 90;
+				case Piece::Type::ROOK: heurValue -= 50;
+				case Piece::Type::BISHOP: heurValue -= 30;
+				case Piece::Type::KNIGHT: heurValue -= 30;
+				case Piece::Type::PAWN: heurValue -= 10;
+
+			}
+
+		}
+
+	}
+
+	return heurValue;
+	
 
 }

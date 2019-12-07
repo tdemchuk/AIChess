@@ -2,7 +2,7 @@
 #include "Gameboard.h"
 #include <iostream>
 
-#define DEBUG		// Uncomment to enable printing out of extra debug information
+//#define DEBUG		// Uncomment to enable printing out of extra debug information
 
 
 /* CELL CLASS DEFINITIONS */
