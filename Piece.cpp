@@ -77,6 +77,8 @@ std::string Piece::statusStr() const
 		case CAPTURED:	return "Captured";
 		case NORMAL:	return "Normal";
 		case PRISTINE:	return "Pristine";
+		case PRISTINE_CHECK: return "Pristine | In Check";
+		case CHECK:		return "In Check";
 	}
 	return "NO STATUS";
 }
@@ -96,6 +98,12 @@ char Piece::file() const
 int Piece::rank() const
 {
 	return m_pos.x + 1;		// position is 0-indexed, add 1 to get proper rank
+}
+
+int Piece::relativeRank() const
+{
+	if (m_orientation == 1) return rank();
+	else return (9 - rank());
 }
 
 glm::vec2 Piece::getPos() const
