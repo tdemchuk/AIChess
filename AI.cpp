@@ -120,10 +120,15 @@ int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2])
 			switch (blackOwned[i]->type()) {
 
 				case Piece::Type::KING: heurValue += 900;
+					break;
 				case Piece::Type::QUEEN: heurValue += 90;
+					break;
 				case Piece::Type::ROOK: heurValue += 50;
+					break;
 				case Piece::Type::BISHOP: heurValue += 30;
+					break;
 				case Piece::Type::KNIGHT: heurValue += 30;
+					break;
 				case Piece::Type::PAWN: heurValue += 10;
 
 			}
@@ -135,10 +140,15 @@ int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2])
 			switch (whiteOwned[i]->type()) {
 
 				case Piece::Type::KING: heurValue -= 900;
+					break;
 				case Piece::Type::QUEEN: heurValue -= 90;
+					break;
 				case Piece::Type::ROOK: heurValue -= 50;
+					break;
 				case Piece::Type::BISHOP: heurValue -= 30;
+					break;
 				case Piece::Type::KNIGHT: heurValue -= 30;
+					break;
 				case Piece::Type::PAWN: heurValue -= 10;
 
 			}

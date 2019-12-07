@@ -52,8 +52,19 @@ void Game::play(UI* ui, Mode mode) {
 	// Daniel Edit - Initialize AI here
 	if (aiEnabled) {
 
-		//TODO - Integrate Mode into the constructor
-		ai = new AI(0);
+		int ply;
+
+		switch (mode.diff) {
+
+			case 0: ply = 2;
+				break;
+			case 1: ply = 3;
+				break;
+			case 2: ply = 4;
+
+		}
+
+		ai = new AI(ply);
 
 	}
 
