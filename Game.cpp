@@ -73,7 +73,13 @@ void Game::play(UI* ui, Mode mode) {
 		if (aiEnabled && curPlayer == 1) {
 
 			//Perform AB Prune if so
-			input = ai->ABPrune(board, players, kings, 0, 0);
+			input = ai->ABPrune(board, players, kings, INT_MIN, INT_MAX, curPlayer, 0);
+
+			//Generate playables for AI
+			playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));
+
+			std::cout << "\n Piece chosen: " << input[0];
+			std::cout << "\n Move chosen: " << input[1] << "\n";
 
 		}
 
