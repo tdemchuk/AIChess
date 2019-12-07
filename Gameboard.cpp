@@ -117,7 +117,7 @@ Piece * Gameboard::move(Piece * piece, Move to)
 		m_history.push(last);
 	}
 
-	bool enPassant = to.special && piece->type() == Piece::Type::KING ? true : false;
+	bool enPassant = to.special && piece->type() == Piece::Type::PAWN ? true : false;
 
 	// Backup to History Stack
 	last.special = to.special;
@@ -125,12 +125,21 @@ Piece * Gameboard::move(Piece * piece, Move to)
 	last.to = to.coord;
 	last.movedStatus = piece->getStatus();
 
+	if (last.special) std::cout << "Special Move!\n";
+	if (enPassant) {
+		std::cout << "En PAssant Move\n\tPiece : ";
+		print(piece);
+		std::cout << "\n";
+	}
+
 	from = xytoi(piece->getPos());
 	captured = place(piece, to.coord);	
 	if (enPassant) {	// Handle En Passant Move
 		glm::vec2 capLoc = to.coord - glm::vec2(piece->orientation(),0);
 		captured = check(capLoc);
 		m_board[xytoi(capLoc)].set(nullptr);
+		std::cout << "\tCaptured : ";
+		print(captured);
 	}
 	m_board[from].set(nullptr);
 
@@ -139,6 +148,7 @@ Piece * Gameboard::move(Piece * piece, Move to)
 	if (captured) {
 		last.capturedStatus = captured->getStatus();
 		captured->setStatus(Piece::Status::CAPTURED);	// Mark captured piece as captured
+		captured->setPos(-1,-1);
 	}
 	m_history.push(last);
 	return captured;
@@ -400,7 +410,6 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 	if (isPawn) {	
 		bool firstTurn = m_history.empty();
 		if (!firstTurn) last = m_history.top();
-		int x_req = 3 + ((orientation + 1) / 2);
 		glm::vec2 l_diag(1 * orientation, -1 * orientation);
 		glm::vec2 r_diag(1 * orientation, 1 * orientation);
 		move.special = false;
@@ -409,7 +418,7 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 		if (atPos) {
 			if (atPos->team() != team) moves.push_back(move);
 		}
-		else if (piece.getPos().x == x_req && !firstTurn) {	// check en passant
+		else if (piece.relativeRank() == 5 && !firstTurn) {	// check en passant
 			atPos = check(last.to);
 			if (atPos) {
 				if (atPos->type() == Piece::Type::PAWN && abs(last.to.x - last.from.x) > 1 && last.to.y == move.coord.y) {	// if opponent moved a pawn 2 spaces last turn in an adjacent file
@@ -424,7 +433,7 @@ std::vector<Gameboard::Move> Gameboard::generateMoves(Piece & piece, Piece& king
 		if (atPos) {
 			if (atPos->team() != team) moves.push_back(move);
 		}
-		else if (piece.getPos().x == x_req && !firstTurn) {	// check en passant
+		else if (piece.relativeRank() == 5 && !firstTurn) {	// check en passant
 			atPos = check(last.to);
 			if (atPos) {
 				if (atPos->type() == Piece::Type::PAWN && abs(last.to.x - last.from.x) > 1 && last.to.y == move.coord.y) {	// if opponent moved a pawn 2 spaces last turn in an adjacent file
@@ -583,5 +592,5 @@ int Gameboard::rtoy(int rank) const
 
 void Gameboard::print(Piece* piece)
 {
-	std::cout << piece->ID() << " | " << piece->teamStr() << " | " << piece->typeStr() << " | " << piece->statusStr() << " | [" << piece->getPos().x << "," << piece->getPos().y << "]";
+	std::cout << piece->ID() << " | " << piece->teamStr() << " | " << piece->typeStr() << " | " << piece->statusStr() << " | [" << piece->rank() << "," << piece->file() << "]";
 }

@@ -10,7 +10,7 @@ void Game::play(UI* ui, Mode mode) {
 	// Local Vars
 	Gameboard	board;
 	AI*			ai = nullptr;
-	int			curPlayer	= 0;				// current player in game
+	int			curPlayer	= 0;				// current player in game [default = 0]
 	bool		done		= false;			// If Game has finished [win/loss/draw occurred]
 	std::vector<Gameboard::Playable> playables;	// List of moves current player can make
 	bool		inCheck		= false;			// If the current players King is in check at the start of their turn
@@ -23,17 +23,16 @@ void Game::play(UI* ui, Mode mode) {
 	Piece* kings[2];
 
 	players[0].create(Piece::Type::ROOK, glm::vec2(0, 0), board);
-	//players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 1), board);
-	//players[0].create(Piece::Type::BISHOP, glm::vec2(0, 2), board);
-	//players[0].create(Piece::Type::QUEEN, glm::vec2(0, 3), board);
+	players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 1), board);
+	players[0].create(Piece::Type::BISHOP, glm::vec2(0, 2), board);
+	players[0].create(Piece::Type::QUEEN, glm::vec2(0, 3), board);
 	kings[0] = players[0].create(Piece::Type::KING, glm::vec2(0, 4), board);		// store created king
-	//players[0].create(Piece::Type::BISHOP, glm::vec2(0, 5), board);
-	//players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 6), board);
+	players[0].create(Piece::Type::BISHOP, glm::vec2(0, 5), board);
+	players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 6), board);
 	players[0].create(Piece::Type::ROOK, glm::vec2(0, 7), board);
 	for (int i = 0; i < board.COL; i++) {
 		players[0].create(Piece::Type::PAWN, glm::vec2(1, i), board);
 	}
-	players[0].create(Piece::Type::PAWN, glm::vec2(4, 4), board);
 
 	players[1].create(Piece::Type::ROOK, glm::vec2(7, 0), board);
 	players[1].create(Piece::Type::KNIGHT, glm::vec2(7 ,1), board);
@@ -108,7 +107,6 @@ void Game::play(UI* ui, Mode mode) {
 
 			// 3) Generate list of moves for current player
 			playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));
-			ui->drawBoard(board);
 
 			// 4) Check end conditions
 			if (playables.size() == 0) {
