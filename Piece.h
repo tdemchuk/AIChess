@@ -28,9 +28,11 @@ public:
 	};
 
 	enum Status {
-		CAPTURED,	// Piece has been captured by the opposing Player
-		NORMAL,		// Piece is on the board and has been moved
-		PRISTINE	// Piece hasn't been touched --> still in initial position
+		CAPTURED,		// Piece has been captured by the opposing Player
+		NORMAL,			// Piece is on the board and has been moved
+		PRISTINE,		// Piece hasn't been touched --> still in initial position
+		PRISTINE_CHECK,	// KING ONLY - Unmoved and in check
+		CHECK			// KING ONLY - Moved and in check
 	};
 
 	static unsigned int glob_ID;
@@ -52,6 +54,7 @@ public:
 	bool isOnBoard() const;				// Returns whether or not this piece is on the gameboard (has a valid rank and file)
 	char file() const;					// Returns the file of this piece on the board [NUL if not on board], [a-h used]
 	int rank() const;					// Returns the rank of this piece on the board [-1 if not on board], [1-8 used]
+	int relativeRank() const;			// Returns the relative rank of this piece on the board [1->8]
 	glm::vec2 getPos() const;			// Returns the coordinates of this piece on the gameboard
 	void setPos(int x, int y);			// Sets the coordinates of this piece on the board	
 	bool canPromote() const;			// If this piece is eligible for promotion

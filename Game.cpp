@@ -9,7 +9,7 @@ void Game::play(UI* ui, Mode mode) {
 
 	// Local Vars
 	Gameboard	board;
-	AI*			ai			= nullptr;
+	AI*			ai = nullptr;
 	int			curPlayer	= 0;				// current player in game
 	bool		done		= false;			// If Game has finished [win/loss/draw occurred]
 	std::vector<Gameboard::Playable> playables;	// List of moves current player can make
@@ -23,16 +23,17 @@ void Game::play(UI* ui, Mode mode) {
 	Piece* kings[2];
 
 	players[0].create(Piece::Type::ROOK, glm::vec2(0, 0), board);
-	players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 1), board);
-	players[0].create(Piece::Type::BISHOP, glm::vec2(0, 2), board);
-	players[0].create(Piece::Type::QUEEN, glm::vec2(0, 3), board);
+	//players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 1), board);
+	//players[0].create(Piece::Type::BISHOP, glm::vec2(0, 2), board);
+	//players[0].create(Piece::Type::QUEEN, glm::vec2(0, 3), board);
 	kings[0] = players[0].create(Piece::Type::KING, glm::vec2(0, 4), board);		// store created king
-	players[0].create(Piece::Type::BISHOP, glm::vec2(0, 5), board);
-	players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 6), board);
+	//players[0].create(Piece::Type::BISHOP, glm::vec2(0, 5), board);
+	//players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 6), board);
 	players[0].create(Piece::Type::ROOK, glm::vec2(0, 7), board);
 	for (int i = 0; i < board.COL; i++) {
 		players[0].create(Piece::Type::PAWN, glm::vec2(1, i), board);
 	}
+	players[0].create(Piece::Type::PAWN, glm::vec2(4, 4), board);
 
 	players[1].create(Piece::Type::ROOK, glm::vec2(7, 0), board);
 	players[1].create(Piece::Type::KNIGHT, glm::vec2(7 ,1), board);
@@ -52,7 +53,7 @@ void Game::play(UI* ui, Mode mode) {
 	if (aiEnabled) {
 
 		//TODO - Integrate Mode into the constructor
-		ai = new AI(3);
+		ai = new AI(0);
 
 	}
 
@@ -85,11 +86,18 @@ void Game::play(UI* ui, Mode mode) {
 		// Daniel Edit - Human Player Turn
 
 		else {
-			// 2) Generate list of moves for current player
-			playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));		// TODO - debug write access violation error - nullptr issue
+			// 2) Test to see if King is in Check
+			if (board.isThreatened(*kings[curPlayer])) {
+				inCheck = true;
+				if (kings[curPlayer]->getStatus() == Piece::Status::NORMAL) kings[curPlayer]->setStatus(Piece::Status::CHECK);
+				else kings[curPlayer]->setStatus(Piece::Status::PRISTINE_CHECK);
+			}
+			else if (kings[curPlayer]->getStatus() == Piece::Status::PRISTINE_CHECK) kings[curPlayer]->setStatus(Piece::Status::PRISTINE);
+			else if (kings[curPlayer]->getStatus() == Piece::Status::CHECK) kings[curPlayer]->setStatus(Piece::Status::NORMAL);
+
+			// 3) Generate list of moves for current player
+			playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));
 			ui->drawBoard(board);
-			// 3) Test to see if king is in check
-			inCheck = board.isThreatened(*(kings[curPlayer]));
 
 			// 4) Check end conditions
 			if (playables.size() == 0) {
@@ -117,21 +125,13 @@ void Game::play(UI* ui, Mode mode) {
 
 		// 7) Handle Pawn Promotion
 		if (playables[input.x].piece->type() == Piece::Type::PAWN && playables[input.x].piece->canPromote()) {
-			if (aiEnabled && curPlayer == 1) {
-				playables[input.x].piece->promote(Piece::Type::QUEEN);
-			}
-			else {
-				playables[input.x].piece->promote(ui->promptPromote());
-			}
+			playables[input.x].piece->promote(ui->promptPromote());
 		}
 
 		ui->drawBoard(board);
 
 		// 8) Swap Current Player and Repeat
 		curPlayer = 1 - curPlayer;
-
-		//if (curPlayer == 0) done = true;		// DEBUG
-		//done = true;
 	}
 
 	// Cleanup
