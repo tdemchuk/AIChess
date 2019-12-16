@@ -55,11 +55,11 @@ void Game::play(UI* ui, Mode mode) {
 
 		switch (mode.diff) {
 
-			case 0: ply = 2;
+			case 0: ply = 4;
 				break;
-			case 1: ply = 3;
+			case 1: ply = 5;
 				break;
-			case 2: ply = 4;
+			case 2: ply = 6;
 
 		}
 
@@ -137,7 +137,9 @@ void Game::play(UI* ui, Mode mode) {
 			if (aiEnabled && curPlayer == 1) {
 				playables[input.x].piece->promote(Piece::Type::QUEEN);
 			}
-			playables[input.x].piece->promote(ui->promptPromote());
+			else {
+				playables[input.x].piece->promote(ui->promptPromote());
+			}
 		}
 
 		ui->drawBoard(board);

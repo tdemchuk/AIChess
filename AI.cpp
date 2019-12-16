@@ -102,6 +102,10 @@ glm::vec2 AI::ABPrune(Gameboard& board, Player (&players)[2], Piece* (&kings)[2]
 int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2]) {
 
 	int heurValue = 0;
+	int whiteAvg = 0;
+	int blackAvg = 0;
+	int whiteNC = 0; //white pieces not captured
+	int blackNC = 0; //black pieces not captured
 	std::vector<Piece*> whiteOwned = players[0].getOwned();
 	std::vector<Piece*> blackOwned = players[1].getOwned();
 
@@ -116,6 +120,9 @@ int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2])
 	for (int i = 0; i < whiteOwned.size(); i++) {
 
 		if (blackOwned[i]->getStatus() != Piece::Status::CAPTURED) {
+
+			blackAvg += blackOwned[i]->relativeRank();
+			blackNC += 1;
 
 			switch (blackOwned[i]->type()) {
 
@@ -137,6 +144,9 @@ int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2])
 
 		if (whiteOwned[i]->getStatus() != Piece::Status::CAPTURED) {
 
+			whiteAvg += whiteOwned[i]->relativeRank();
+			whiteNC += 1;
+
 			switch (whiteOwned[i]->type()) {
 
 				case Piece::Type::KING: heurValue -= 900;
@@ -156,6 +166,14 @@ int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2])
 		}
 
 	}
+
+	//Apply Relative Rank Heuristic
+
+	blackAvg /= blackNC;
+	whiteAvg /= whiteNC;
+
+	heurValue += blackAvg*2;
+	heurValue -= whiteAvg*2;
 
 	return heurValue;
 	
