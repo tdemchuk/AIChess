@@ -102,6 +102,10 @@ glm::vec2 AI::ABPrune(Gameboard& board, Player (&players)[2], Piece* (&kings)[2]
 int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2]) {
 
 	int heurValue = 0;
+	double whiteAvg = 0;
+	double blackAvg = 0;
+	int whiteNC = 0; //white pieces not captured
+	int blackNC = 0; //black pieces not captured
 	std::vector<Piece*> whiteOwned = players[0].getOwned();
 	std::vector<Piece*> blackOwned = players[1].getOwned();
 
@@ -117,13 +121,21 @@ int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2])
 
 		if (blackOwned[i]->getStatus() != Piece::Status::CAPTURED) {
 
+			blackAvg += blackOwned[i]->relativeRank();
+			blackNC += 1;
+
 			switch (blackOwned[i]->type()) {
 
 				case Piece::Type::KING: heurValue += 900;
+					break;
 				case Piece::Type::QUEEN: heurValue += 90;
+					break;
 				case Piece::Type::ROOK: heurValue += 50;
+					break;
 				case Piece::Type::BISHOP: heurValue += 30;
+					break;
 				case Piece::Type::KNIGHT: heurValue += 30;
+					break;
 				case Piece::Type::PAWN: heurValue += 10;
 
 			}
@@ -132,19 +144,39 @@ int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2])
 
 		if (whiteOwned[i]->getStatus() != Piece::Status::CAPTURED) {
 
+			whiteAvg += whiteOwned[i]->relativeRank();
+			whiteNC += 1;
+
 			switch (whiteOwned[i]->type()) {
 
 				case Piece::Type::KING: heurValue -= 900;
+					break;
 				case Piece::Type::QUEEN: heurValue -= 90;
+					break;
 				case Piece::Type::ROOK: heurValue -= 50;
+					break;
 				case Piece::Type::BISHOP: heurValue -= 30;
+					break;
 				case Piece::Type::KNIGHT: heurValue -= 30;
+					break;
 				case Piece::Type::PAWN: heurValue -= 10;
 
 			}
 
 		}
 
+	}
+
+	//Apply Relative Rank Heuristic
+
+	blackAvg /= blackNC;
+	whiteAvg /= whiteNC;
+
+	if (blackAvg > whiteAvg) {
+		heurValue += blackAvg;
+	}
+	else {
+		heurValue -= whiteAvg;
 	}
 
 	return heurValue;

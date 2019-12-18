@@ -125,12 +125,14 @@ Piece * Gameboard::move(Piece * piece, Move to)
 	last.to = to.coord;
 	last.movedStatus = piece->getStatus();
 
+#ifdef DEBUG
 	if (last.special) std::cout << "Special Move!\n";
 	if (enPassant) {
 		std::cout << "En PAssant Move\n\tPiece : ";
 		print(piece);
 		std::cout << "\n";
 	}
+#endif
 
 	from = xytoi(piece->getPos());
 	captured = place(piece, to.coord);	

@@ -51,8 +51,19 @@ void Game::play(UI* ui, Mode mode) {
 	// Daniel Edit - Initialize AI here
 	if (aiEnabled) {
 
-		//TODO - Integrate Mode into the constructor
-		ai = new AI(0);
+		int ply;
+
+		switch (mode.diff) {
+
+			case 0: ply = 2;
+				break;
+			case 1: ply = 5;
+				break;
+			case 2: ply = 6;
+
+		}
+
+		ai = new AI(ply);
 
 	}
 
@@ -71,11 +82,32 @@ void Game::play(UI* ui, Mode mode) {
 		// Daniel Edit - Check if it's the AI's turn
 		if (aiEnabled && curPlayer == 1) {
 
-			//Perform AB Prune if so
-			input = ai->ABPrune(board, players, kings, INT_MIN, INT_MAX, curPlayer, 0);
+			// 2) Test to see if King is in Check
+			if (board.isThreatened(*kings[curPlayer])) {
+				inCheck = true;
+				if (kings[curPlayer]->getStatus() == Piece::Status::NORMAL) kings[curPlayer]->setStatus(Piece::Status::CHECK);
+				else kings[curPlayer]->setStatus(Piece::Status::PRISTINE_CHECK);
+			}
+			else if (kings[curPlayer]->getStatus() == Piece::Status::PRISTINE_CHECK) kings[curPlayer]->setStatus(Piece::Status::PRISTINE);
+			else if (kings[curPlayer]->getStatus() == Piece::Status::CHECK) kings[curPlayer]->setStatus(Piece::Status::NORMAL);
 
-			//Generate playables for AI
+			// 3) Generate playables for AI
 			playables = board.genPlayables(players[curPlayer].getOwned(), *(kings[curPlayer]));
+
+			// 4) Check end conditions
+			if (playables.size() == 0) {
+				if (inCheck) {	// Other player won
+					ui->drawMessage("Player 1 Won!");	// TODO - make non-current player number print here
+				}
+				else {			// draw
+					ui->drawMessage("Draw!");
+				}
+				done = true;
+				continue;
+			}
+
+			// 5) Perform AB Prune to make move
+			input = ai->ABPrune(board, players, kings, INT_MIN, INT_MAX, curPlayer, 0);
 
 			std::cout << "\n Piece chosen: " << input[0];
 			std::cout << "\n Move chosen: " << input[1] << "\n";
@@ -126,7 +158,9 @@ void Game::play(UI* ui, Mode mode) {
 			if (aiEnabled && curPlayer == 1) {
 				playables[input.x].piece->promote(Piece::Type::QUEEN);
 			}
-			playables[input.x].piece->promote(ui->promptPromote());
+			else {
+				playables[input.x].piece->promote(ui->promptPromote());
+			}
 		}
 
 		ui->drawBoard(board);
