@@ -4,6 +4,9 @@
 #include "AI.h" //Daniel Edit
 
 /* GAME CLASS DEFINITIONS */
+/*
+	Main Game Loop
+*/
 
 void Game::play(UI* ui, Mode mode) {
 
@@ -105,6 +108,26 @@ void Game::play(UI* ui, Mode mode) {
 				done = true;
 				continue;
 			}
+			else {	// Check for only kings left
+				bool onlyKings = true;
+				for (int i = 0; i < players[0].getOwned().size(); i++) {
+					if (players[0].getOwned()[i]->type() != Piece::Type::KING && players[0].getOwned()[i]->isOnBoard() == true) {
+						onlyKings = false;
+						break;
+					}
+				}
+				for (int i = 0; i < players[1].getOwned().size(); i++) {
+					if (players[1].getOwned()[i]->type() != Piece::Type::KING && players[1].getOwned()[i]->isOnBoard() == true) {
+						onlyKings = false;
+						break;
+					}
+				}
+				if (onlyKings) {
+					ui->drawMessage("Draw!");
+					done = true;
+					continue;
+				}
+			}
 
 			// 5) Perform AB Prune to make move
 			input = ai->ABPrune(board, players, kings, INT_MIN, INT_MAX, curPlayer, 0);
@@ -149,7 +172,6 @@ void Game::play(UI* ui, Mode mode) {
 		// Daniel Edit - After AI or Human Player's Turn
 
 		// 6) Update Game State, Update UI
-			// TODO - update game state based on user selected move
 		captured = board.move(playables[input.x].piece,playables[input.x].moves[input.y]);
 		if (captured) players[curPlayer].capture(captured);	// Add captured piece [if there is one] to current players captured list
 
