@@ -102,8 +102,8 @@ glm::vec2 AI::ABPrune(Gameboard& board, Player (&players)[2], Piece* (&kings)[2]
 int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2]) {
 
 	int heurValue = 0;
-	int whiteAvg = 0;
-	int blackAvg = 0;
+	double whiteAvg = 0;
+	double blackAvg = 0;
 	int whiteNC = 0; //white pieces not captured
 	int blackNC = 0; //black pieces not captured
 	std::vector<Piece*> whiteOwned = players[0].getOwned();
@@ -172,8 +172,12 @@ int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2])
 	blackAvg /= blackNC;
 	whiteAvg /= whiteNC;
 
-	heurValue += blackAvg*2;
-	heurValue -= whiteAvg*2;
+	if (blackAvg > whiteAvg) {
+		heurValue += blackAvg;
+	}
+	else {
+		heurValue -= whiteAvg;
+	}
 
 	return heurValue;
 	
