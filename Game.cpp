@@ -30,7 +30,7 @@ void Game::play(UI* ui, Mode mode) {
 	players[0].create(Piece::Type::BISHOP, glm::vec2(0, 5), board);
 	players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 6), board);
 	players[0].create(Piece::Type::ROOK, glm::vec2(0, 7), board);
-	for (int i = 0; i < board.COL; i++) {
+	for (int i = 0; i < board.COL; i++) {	
 		players[0].create(Piece::Type::PAWN, glm::vec2(1, i), board);
 	}
 
@@ -42,7 +42,7 @@ void Game::play(UI* ui, Mode mode) {
 	players[1].create(Piece::Type::BISHOP, glm::vec2(7, 5), board);
 	players[1].create(Piece::Type::KNIGHT, glm::vec2(7, 6), board);
 	players[1].create(Piece::Type::ROOK, glm::vec2(7, 7), board);
-	for (int i = 0; i < board.COL; i++) {
+	for (int i = 0; i < board.COL; i++) {	
 		players[1].create(Piece::Type::PAWN, glm::vec2(6, i), board);
 	}
 
@@ -110,7 +110,7 @@ void Game::play(UI* ui, Mode mode) {
 			}
 
 			// 5) Prompt Current Player to make a move
-			input = ui->promptMove(playables);	// TODO - make function return user selected move
+			input = ui->promptMove(playables);	
 		}
 
 

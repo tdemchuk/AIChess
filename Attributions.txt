@@ -1,0 +1,10 @@
+Various OpenGL References : 
+	- https://learnopengl.com
+
+Piece Images : 
+	- By en:User:Cburnett - Own workThis W3C-unspecified vector image was created with Inkscape., CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=1499803
+	- Found At : https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces
+
+Image Loader Library
+	- By Sean Barret - https://github.com/nothings
+	- Found At :  https://github.com/nothings/stb/blob/master/stb_image.h

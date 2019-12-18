@@ -243,6 +243,7 @@ bool Gameboard::isThreatened(Piece & piece)	// Returns true if passed in piece i
 	glm::vec2 checkpos;
 	Piece* atPos = nullptr;
 
+
 	// Check line of sight to enemy pieces
 	for (int i = 0; i < los.size(); i++) {
 		diag = (i % 2 == 0 ? false : true);
@@ -250,27 +251,32 @@ bool Gameboard::isThreatened(Piece & piece)	// Returns true if passed in piece i
 		extend = true;
 
 		do {
-			if (!isValidCoord(checkpos)) break;
+			if (!isValidCoord(checkpos)) {
+				break;
+			}
 			atPos = check(checkpos);
-			range = sqrt(pow(abs(checkpos.x), 2) + pow(abs(checkpos.y), 2));
+			range = sqrt(pow(abs(checkpos.x - piece.getPos().x), 2) + pow(abs(checkpos.y - piece.getPos().y), 2));
 
 			if (atPos) {	// Checkpos contains a piece
 				extend = false;
 				if (atPos->team() != piece.team()) {	// Enemy piece encountered
 					switch (atPos->type()) {
-					case Piece::Type::BISHOP :
+					case Piece::Type::BISHOP:
 						if (diag) return true;
 						break;
-					case Piece::Type::KING :
+					case Piece::Type::KING:
 						if (range == 1) return true;
 						break;
-					case Piece::Type::PAWN :
-						if (diag && range == 1) return true;
+					case Piece::Type::PAWN:
+						if (diag && range == 1) {
+							if (atPos->rank() < piece.rank() && atPos->orientation() == 1)			return true;
+							else if (atPos->rank() > piece.rank() && atPos->orientation() == -1)	return true;
+						}
 						break;
-					case Piece::Type::QUEEN :
+					case Piece::Type::QUEEN:
 						return true;
 						break;
-					case Piece::Type::ROOK :
+					case Piece::Type::ROOK:
 						if (!diag) return true;
 						break;
 					}
@@ -592,5 +598,5 @@ int Gameboard::rtoy(int rank) const
 
 void Gameboard::print(Piece* piece)
 {
-	std::cout << piece->ID() << " | " << piece->teamStr() << " | " << piece->typeStr() << " | " << piece->statusStr() << " | [" << piece->rank() << "," << piece->file() << "]";
+	std::cout << piece->ID() << " | " << piece->teamStr() << " | " << piece->typeStr() << " | " << piece->statusStr() << " | [" << piece->rank() << "," << (char)piece->file() << "]";
 }

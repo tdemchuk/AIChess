@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{29e76529-3def-4c42-a011-2c5a99e2cffa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -45,6 +48,18 @@
     <ClInclude Include="AI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -65,5 +80,22 @@
     <ClCompile Include="ConsoleUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
