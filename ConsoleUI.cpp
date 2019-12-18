@@ -3,6 +3,7 @@
 #include <iostream>
 
 
+// Draws the current board state of the game to the console
 void ConsoleUI::drawBoard(const Gameboard& board) const
 {
 	Piece* curPiece;
@@ -77,6 +78,8 @@ glm::vec2 ConsoleUI::promptMove(std::vector<Gameboard::Playable>& moves)
 	glm::vec2 chosen;
 	int input = 0;
 
+
+	std::cout << "\nEnter '-1' To Forfeit The Game\n";
 	std::cout << "\nSelect a Piece To Move [Enter Index From Following List] :\n";
 
 	for (int i = 0; i < moves.size(); i++) {
@@ -87,11 +90,20 @@ glm::vec2 ConsoleUI::promptMove(std::vector<Gameboard::Playable>& moves)
 	do {
 		if (input != 0) std::cout << "Invalid Move";
 		std::cout << "\n--> ";
-		std::cin >> input;
+		if (!(std::cin >> input)) {
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			input = -9999;
+		}
 		std::cout << "\n";
+		if (input == -1) {
+			chosen.x = -1;
+			return chosen;
+		}
 	} while (input < 0 || input >= moves.size());
 
 	chosen.x = input;
+	if (input == -1) return chosen;
 
 	std::cout << "\nSelect a Move To Make [Enter Index From Following List] :\n";
 
@@ -103,8 +115,16 @@ glm::vec2 ConsoleUI::promptMove(std::vector<Gameboard::Playable>& moves)
 	do {
 		if (input != 0) std::cout << "Invalid Move";
 		std::cout << "\n--> ";
-		std::cin >> input;
+		if (!(std::cin >> input)) {
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			input = -9999;
+		}
 		std::cout << "\n";
+		if (input == -1) {
+			chosen.x = -1;
+			return chosen;
+		}
 	} while (input < 0 || input >= moves[chosen.x].moves.size());
 
 	chosen.y = input;
@@ -124,7 +144,11 @@ Piece::Type ConsoleUI::promptPromote()
 	do {
 		if (input != 0) std::cout << "Invalid Input";
 		std::cout << "\n--> ";
-		std::cin >> input;
+		if (!(std::cin >> input)) {
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			input = -9999;
+		}
 		std::cout << "\n";
 	} while (input < 0 || input > 3);
 
@@ -150,7 +174,11 @@ Mode ConsoleUI::promptGameMode()
 	do {
 		if (input != 1) std::cout << "Invalid Input";
 		std::cout << "\n--> ";
-		std::cin >> input;
+		if (!(std::cin >> input)) {
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			input = -9999;
+		}
 		std::cout << "\n";
 	} while (input < 1 || input > 2);
 
@@ -167,7 +195,11 @@ Mode ConsoleUI::promptGameMode()
 	do {
 		if (input != 0) std::cout << "Invalid Input";
 		std::cout << "\n--> ";
-		std::cin >> input;
+		if (!(std::cin >> input)) {
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			input = -9999;
+		}
 		std::cout << "\n";
 	} while (input < 0 || input > 2);
 

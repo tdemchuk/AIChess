@@ -20,6 +20,7 @@ void Game::play(UI* ui, Mode mode) {
 	glm::vec2	input;							// User Input 
 	Piece*		captured	= nullptr;			// captured piece placeholder
 	bool		aiEnabled	= mode.numPlayers == 1 ? true : false;		// if the AI is standing in for player 2 or not
+	std::string msg;
 
 	// 1) Init Players, Pieces
 	Player players[] = {Player(Color::WHITE), Player(Color::BLACK)};
@@ -81,6 +82,7 @@ void Game::play(UI* ui, Mode mode) {
 	// Begin Game Loop
 	while (!done) {
 
+		inCheck = false;
 
 		// Daniel Edit - Check if it's the AI's turn
 		if (aiEnabled && curPlayer == 1) {
@@ -100,7 +102,7 @@ void Game::play(UI* ui, Mode mode) {
 			// 4) Check end conditions
 			if (playables.size() == 0) {
 				if (inCheck) {	// Other player won
-					ui->drawMessage("Player 1 Won!");	// TODO - make non-current player number print here
+					ui->drawMessage("You Won!");	// AI Lost --> Human Player Won
 				}
 				else {			// draw
 					ui->drawMessage("Draw!");
@@ -163,9 +165,42 @@ void Game::play(UI* ui, Mode mode) {
 				done = true;
 				continue;
 			}
+			else {	// Check for only kings left
+				bool onlyKings = true;
+				for (int i = 0; i < players[0].getOwned().size(); i++) {
+					if (players[0].getOwned()[i]->type() != Piece::Type::KING && players[0].getOwned()[i]->isOnBoard() == true) {
+						onlyKings = false;
+						break;
+					}
+				}
+				for (int i = 0; i < players[1].getOwned().size(); i++) {
+					if (players[1].getOwned()[i]->type() != Piece::Type::KING && players[1].getOwned()[i]->isOnBoard() == true) {
+						onlyKings = false;
+						break;
+					}
+				}
+				if (onlyKings) {
+					ui->drawMessage("Draw!");
+					done = true;
+					continue;
+				}
+			}
 
 			// 5) Prompt Current Player to make a move
 			input = ui->promptMove(playables);	
+
+			// Check for Forfeiture
+			if (input.x == -1 || input.y == -1) {
+				msg = "Player " + (curPlayer+1);
+				msg += " Forfeits.";
+				ui->drawMessage(msg);
+				msg = "Player " + ((1 - curPlayer) + 1);
+				msg += "Wins!";
+				ui->drawMessage(msg);
+
+				done = true;
+				continue;
+			}
 		}
 
 
