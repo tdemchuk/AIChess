@@ -1,6 +1,8 @@
 
 #include "AI.h"
 
+//Heuristic Evaluation function is at line 126
+
 AI::AI(int ply)
 	: m_Ply(ply)
 {
@@ -64,11 +66,12 @@ glm::vec2 AI::ABPrune(Gameboard& board, Player (&players)[2], Piece* (&kings)[2]
 				board.undo();
 
 				//Prune
-				
-				if (score.x >= curBeta) {
+
+				if (score.x > curBeta) {
 					return score;
 				}
-				else if (score.x > curAlpha) {
+
+				if (score.x > curAlpha) {
 					curAlpha = score.x;
 				}
 				
@@ -83,13 +86,16 @@ glm::vec2 AI::ABPrune(Gameboard& board, Player (&players)[2], Piece* (&kings)[2]
 				board.undo();
 
 				//Prune
+
 				
-				if (score.x <= curAlpha) {
+				if (score.x < curAlpha) {
 					return score;
 				}
+
 				if (score.x < curBeta) {
 					curBeta = score.x;
 				}
+
 			}
 
 		}
@@ -99,6 +105,24 @@ glm::vec2 AI::ABPrune(Gameboard& board, Player (&players)[2], Piece* (&kings)[2]
 	else return localbestScore;
 }
 
+
+/* This function evalutes the heuristic value of a provided board state using 3 heuristic evaluation strategies:
+
+   [A] Placing a player in check applies + or - 450 points to the heuristic total, depending if that player is white or black
+	   respectively. This amount is half the value of the king and heavily encourages plays that will apply pressure to the
+	   opposition, as well as prevent making moves that leave the AI's king vulnerable.
+
+   [B] Each piece has its own value assigned to it, 10 for pawn, 30 for knight and bishop, 50 for rook, 90 for queen, and 900 for king.
+	   The values are added to the total heuristic value if they are black pieces and subtracted if they are white. A basic strategy that
+	   encourages capturing pieces and prioritizing pieces that are of higher value, with the Kings being the most valuable to capture or lose.
+	   Heavily encourages defensive and offensive moves, while preventing over aggression (i.e. will not encourage sacrificing a rook for a pawn)
+
+   [C] The relative rank of each piece is averaged and weighed against the opponent's average rank. If the black team's relative rank is higher, it
+	   is added to the total, if the white team's relative rank is higher it subtracts from the total. The heuristic is subtle and encourages overall 
+	   aggressive piece progression during stale conditions. Overall, it encourages the AI to have central control, trap the opponent's king, and promote
+	   pawns as fast as possible.
+
+*/
 int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2]) {
 
 	int heurValue = 0;
@@ -112,11 +136,11 @@ int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2])
 	//0 is human player
 	//1 is AI player
 
-	//Apply for each player to be in Check
+	//Apply for each player to be in Check [A]
 	if (board.isThreatened(*(kings[0]))) heurValue += 450;
 	if (board.isThreatened(*(kings[1]))) heurValue -= 450;
 
-	//Apply piece values to heuristic
+	//Apply piece values to heuristic [B]
 	for (int i = 0; i < whiteOwned.size(); i++) {
 
 		if (blackOwned[i]->getStatus() != Piece::Status::CAPTURED) {
@@ -167,7 +191,7 @@ int AI::EvalHeuristic(Gameboard& board, Player(&players)[2], Piece* (&kings)[2])
 
 	}
 
-	//Apply Relative Rank Heuristic
+	//Apply Relative Rank Heuristic [C]
 
 	blackAvg /= blackNC;
 	whiteAvg /= whiteNC;

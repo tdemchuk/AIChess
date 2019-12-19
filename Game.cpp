@@ -163,14 +163,15 @@ void Game::play(UI* ui, Mode mode) {
 
 	ui->drawBoard(board);
 	
-	// Daniel Edit - Initialize AI here
+	// Initialize AI
 	if (aiEnabled) {
 
 		int ply;
 
+		//Apply ply based off difficulty selected
 		switch (mode.diff) {
 
-			case 0: ply = 2;
+			case 0: ply = 4;
 				break;
 			case 1: ply = 5;
 				break;
@@ -201,7 +202,7 @@ void Game::play(UI* ui, Mode mode) {
 
 		inCheck = false;
 
-		// Daniel Edit - Check if it's the AI's turn
+		// Check if it's the AI's turn
 		if (aiEnabled && curPlayer == 1) {
 
 			msg = "\nAI's Turn...\n";
@@ -259,7 +260,7 @@ void Game::play(UI* ui, Mode mode) {
 
 		}
 
-		// Daniel Edit - Human Player Turn
+		// Human Player Turn
 
 		else {
 
@@ -327,7 +328,7 @@ void Game::play(UI* ui, Mode mode) {
 		}
 
 
-		// Daniel Edit - After AI or Human Player's Turn
+		// After AI or Human Player's Turn
 
 		// 6) Update Game State, Update UI
 		captured = board.move(playables[input.x].piece,playables[input.x].moves[input.y]);
