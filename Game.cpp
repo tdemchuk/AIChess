@@ -80,11 +80,11 @@ void Game::play(UI* ui, Mode mode) {
 	}
 	if (numlines < 7) goodFormat = false;
 	if (numkings_b != 1) {
-		ui->drawMessage("BLACK Does Not Meet The King Requirement\n");
+		if (isOpen) ui->drawMessage("BLACK Does Not Meet The King Requirement\n");
 		goodFormat = false;
 	}
 	if (numkings_w != 1) {
-		ui->drawMessage("WHITE Does Not Meet The King Requirement\n");
+		if (isOpen) ui->drawMessage("WHITE Does Not Meet The King Requirement\n");
 		goodFormat = false;
 	}
 	if (goodFormat) {
