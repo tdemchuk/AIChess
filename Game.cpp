@@ -27,31 +27,138 @@ void Game::play(UI* ui, Mode mode) {
 	Player players[] = {Player(Color::WHITE), Player(Color::BLACK)};
 	Piece* kings[2];
 
-	// Attempt to read board override file
+	// Attempt to read board override file [if it exists]
 	std::ifstream file("board.bof");
-
-	players[0].create(Piece::Type::ROOK, glm::vec2(0, 0), board);
-	players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 1), board);
-	players[0].create(Piece::Type::BISHOP, glm::vec2(0, 2), board);
-	players[0].create(Piece::Type::QUEEN, glm::vec2(0, 3), board);
-	kings[0] = players[0].create(Piece::Type::KING, glm::vec2(0, 4), board);		// store created king
-	players[0].create(Piece::Type::BISHOP, glm::vec2(0, 5), board);
-	players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 6), board);
-	players[0].create(Piece::Type::ROOK, glm::vec2(0, 7), board);
-	for (int i = 0; i < board.COL; i++) {	
-		players[0].create(Piece::Type::PAWN, glm::vec2(1, i), board);
+	std::string ln;
+	char bofBoard[8][16];	// 8 lines - 8 dual char clusters [16 chars]
+	int numlines = 0;	// 8 line requirement
+	int numkings_w = 0;	// 1 King tolerance for white team
+	int numkings_b = 0;	// 1 king tolerance for black team
+	char tc, pc;		// Team Code & Piece Code
+	bool isOpen = file.is_open();
+	bool goodFormat = true;		// If BOF is of proper format
+	if (isOpen) ui->drawMessage("Board Override File [BOF] Detected. Loading...\n");
+	while (std::getline(file, ln)) {
+		// Process line of BOF
+		if (ln.size() < 23) {
+			goodFormat = false;
+			break;
+		}
+		for (int i = 0; i < 8; i++) {	// Process up to 8 char clusters
+			tc = ln[(i*3)];			// retrieve team code
+			pc = ln[(i*3) + 1];		// retrieve piece code
+			if (tc == '#' || pc == '#') {
+				if (tc != '#' || pc != '#') {
+					goodFormat = false;
+					break;
+				}
+			}
+			else {
+				// Validate Team Codes
+				if (tc != 'B' && tc != 'W') {
+					ui->drawMessage("Invalid Team Code Found in BOF at line" + std::to_string(numlines+1) + "\n");
+					goodFormat = false;
+					break;
+				}
+				// Validate Piece Codes
+				if (pc != 'R' && pc != 'N' && pc != 'B' && pc != 'Q' && pc != 'K' && pc != 'P') {
+					ui->drawMessage("Invalid Piece Code Found in BOF at line" + std::to_string(numlines + 1) + "\n");
+					goodFormat = false;
+					break;
+				}
+				// Check Kings
+				if (pc == 'K') {
+					if (tc == 'W')			numkings_w++;
+					else if (tc == 'B')		numkings_b++;
+				}
+			}
+			// Store tc and pc
+			bofBoard[numlines][(i * 2)] = tc;
+			bofBoard[numlines][(i * 2) + 1] = pc;
+		}
+		numlines++;
 	}
+	if (numlines < 7) goodFormat = false;
+	if (numkings_b != 1) {
+		ui->drawMessage("BLACK Does Not Meet The King Requirement\n");
+		goodFormat = false;
+	}
+	if (numkings_w != 1) {
+		ui->drawMessage("WHITE Does Not Meet The King Requirement\n");
+		goodFormat = false;
+	}
+	if (goodFormat) {
+		int pl;
+		Piece::Type pt;
+		int x, y;	// board placement coords [r|f]
+		// process bof config and generate initial boardstate
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 16; j++) {
+				tc = bofBoard[i][j];
+				pc = bofBoard[i][++j];
+				std::cout << "TC : " << tc << ",\tPC : " << pc << '\n';
+				if (tc == '#') continue;	// skip empty cells
+				x = abs(i-7);
+				y = j / 2;
+				std::cout << "X : " << x << ",\tY : " << y << '\n';
+				pl = tc == 'W' ? 0 : 1;
+				std::cout << "Player : " << pl << '\n';
+				switch (pc) {
+				case 'R': {
+					pt = Piece::Type::ROOK; 
+					break;
+				}
+				case 'N': {
+					pt = Piece::Type::KNIGHT;
+					break;
+				}
+				case 'B': {
+					pt = Piece::Type::BISHOP;
+					break;
+				}
+				case 'Q': {
+					pt = Piece::Type::QUEEN;
+					break;
+				}
+				case 'K': {
+					pt = Piece::Type::KING;
+					break;
+				}
+				case 'P': {
+					pt = Piece::Type::PAWN;
+					break;
+				}
+				}
+				players[pl].create(pt, glm::vec2(x,y), board);
+			}
+		}
+	}
+	else {	// Draw Default Board
+		if (isOpen) ui->drawMessage("Invalid BOF Format. Loading Default Board Configuration\n");
 
-	players[1].create(Piece::Type::ROOK, glm::vec2(7, 0), board);
-	players[1].create(Piece::Type::KNIGHT, glm::vec2(7 ,1), board);
-	players[1].create(Piece::Type::BISHOP, glm::vec2(7, 2), board);
-	players[1].create(Piece::Type::QUEEN, glm::vec2(7, 3), board);
-	kings[1] = players[1].create(Piece::Type::KING, glm::vec2(7, 4), board);		// store created king
-	players[1].create(Piece::Type::BISHOP, glm::vec2(7, 5), board);
-	players[1].create(Piece::Type::KNIGHT, glm::vec2(7, 6), board);
-	players[1].create(Piece::Type::ROOK, glm::vec2(7, 7), board);
-	for (int i = 0; i < board.COL; i++) {	
-		players[1].create(Piece::Type::PAWN, glm::vec2(6, i), board);
+		players[0].create(Piece::Type::ROOK, glm::vec2(0, 0), board);
+		players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 1), board);
+		players[0].create(Piece::Type::BISHOP, glm::vec2(0, 2), board);
+		players[0].create(Piece::Type::QUEEN, glm::vec2(0, 3), board);
+		kings[0] = players[0].create(Piece::Type::KING, glm::vec2(0, 4), board);		// store created king
+		players[0].create(Piece::Type::BISHOP, glm::vec2(0, 5), board);
+		players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 6), board);
+		players[0].create(Piece::Type::ROOK, glm::vec2(0, 7), board);
+		for (int i = 0; i < board.COL; i++) {
+			players[0].create(Piece::Type::PAWN, glm::vec2(1, i), board);
+		}
+
+		players[1].create(Piece::Type::ROOK, glm::vec2(7, 0), board);
+		players[1].create(Piece::Type::KNIGHT, glm::vec2(7, 1), board);
+		players[1].create(Piece::Type::BISHOP, glm::vec2(7, 2), board);
+		players[1].create(Piece::Type::QUEEN, glm::vec2(7, 3), board);
+		kings[1] = players[1].create(Piece::Type::KING, glm::vec2(7, 4), board);		// store created king
+		players[1].create(Piece::Type::BISHOP, glm::vec2(7, 5), board);
+		players[1].create(Piece::Type::KNIGHT, glm::vec2(7, 6), board);
+		players[1].create(Piece::Type::ROOK, glm::vec2(7, 7), board);
+		for (int i = 0; i < board.COL; i++) {
+			players[1].create(Piece::Type::PAWN, glm::vec2(6, i), board);
+		}
 	}
 
 	ui->drawBoard(board);
@@ -85,6 +192,12 @@ void Game::play(UI* ui, Mode mode) {
 
 	// Begin Game Loop
 	while (!done) {
+
+		if (players[0].getOwned().size() == 0 || players[1].getOwned().size() == 0) {
+			ui->drawMessage("No Pieces On The Board? That Doesn't Seem Right.\nHow About You Find Some Pieces and Try Again?\nGAME OVER.\n");
+			done = true;
+			continue;
+		}
 
 		inCheck = false;
 

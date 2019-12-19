@@ -40,7 +40,7 @@ public:
 		std::vector<Move> moves;	// All board coordinates that the piece can move to
 	};
 
-	struct Hist {
+	struct Hist {			// Move History Object
 		bool special;
 		glm::vec2 from;				
 		glm::vec2 to;
