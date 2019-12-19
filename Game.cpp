@@ -96,13 +96,10 @@ void Game::play(UI* ui, Mode mode) {
 			for (int j = 0; j < 16; j++) {
 				tc = bofBoard[i][j];
 				pc = bofBoard[i][++j];
-				std::cout << "TC : " << tc << ",\tPC : " << pc << '\n';
 				if (tc == '#') continue;	// skip empty cells
 				x = abs(i-7);
 				y = j / 2;
-				std::cout << "X : " << x << ",\tY : " << y << '\n';
 				pl = tc == 'W' ? 0 : 1;
-				std::cout << "Player : " << pl << '\n';
 				switch (pc) {
 				case 'R': {
 					pt = Piece::Type::ROOK; 
@@ -129,7 +126,8 @@ void Game::play(UI* ui, Mode mode) {
 					break;
 				}
 				}
-				players[pl].create(pt, glm::vec2(x,y), board);
+				if (pc == 'K') kings[pl] = players[pl].create(pt, glm::vec2(x, y), board);
+				else players[pl].create(pt, glm::vec2(x,y), board);
 			}
 		}
 	}
