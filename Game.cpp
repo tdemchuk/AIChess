@@ -214,7 +214,11 @@ void Game::play(UI* ui, Mode mode) {
 
 		// 6) Update Game State, Update UI
 		captured = board.move(playables[input.x].piece,playables[input.x].moves[input.y]);
-		if (captured) players[curPlayer].capture(captured);	// Add captured piece [if there is one] to current players captured list
+		if (captured) {
+			players[curPlayer].capture(captured);	// Add captured piece [if there is one] to current players captured list
+			msg = "Captured : " + captured->teamStr() + "," +  captured->typeStr();
+			ui->drawMessage(msg);
+		}
 
 		// 7) Handle Pawn Promotion
 		if (playables[input.x].piece->type() == Piece::Type::PAWN && playables[input.x].piece->canPromote()) {
