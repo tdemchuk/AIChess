@@ -209,4 +209,26 @@ Mode ConsoleUI::promptGameMode()
 }
 
 // Draws the provided message string to the screen (use for win/loss/draw messages)
-void ConsoleUI::drawMessage(std::string msg) {}
+void ConsoleUI::drawMessage(std::string msg) 
+{
+	std::cout << msg;
+}
+
+void ConsoleUI::drawCaptured(Player(&players)[2])
+{
+	// Draw Player 1 Captured List to screen
+	std::cout << "Player 1 (WHITE) Captured : ";
+	for (int i = 0; i < players[0].getCaptured().size(); i++) {
+		if (i != 0) std::cout << ", ";
+		std::cout << players[0].getCaptured()[i]->typeStr();
+	}
+	std::cout << '\n';
+
+	// Draw Player 2 Captured List to screen
+	std::cout << "Player 2 (BLACK) Captured : ";
+	for (int i = 0; i < players[1].getCaptured().size(); i++) {
+		if (i != 0) std::cout << ", ";
+		std::cout << players[1].getCaptured()[i]->typeStr();
+	}
+	std::cout << '\n';
+}

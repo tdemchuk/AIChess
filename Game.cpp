@@ -87,6 +87,9 @@ void Game::play(UI* ui, Mode mode) {
 		// Daniel Edit - Check if it's the AI's turn
 		if (aiEnabled && curPlayer == 1) {
 
+			msg = "\nAI's Turn...\n";
+			ui->drawMessage(msg);
+
 			// 2) Test to see if King is in Check
 			if (board.isThreatened(*kings[curPlayer])) {
 				inCheck = true;
@@ -134,14 +137,19 @@ void Game::play(UI* ui, Mode mode) {
 			// 5) Perform AB Prune to make move
 			input = ai->ABPrune(board, players, kings, INT_MIN, INT_MAX, curPlayer, 0);
 
-			std::cout << "\n Piece chosen: " << input[0];
-			std::cout << "\n Move chosen: " << input[1] << "\n";
+			msg = playables[input.x].piece->typeStr() + " Moved From [" + std::to_string(playables[input.x].piece->rank()) + "," + (char)(playables[input.x].piece->file()) + "] To [" + std::to_string((int)(playables[input.x].moves[input.y].coord.x + 1)) + "," + (char)(playables[input.x].moves[input.y].coord.y + 97) + "]\n";
+			ui->drawMessage(msg);
 
 		}
 
 		// Daniel Edit - Human Player Turn
 
 		else {
+
+			msg = "\nPlayer " + std::to_string((curPlayer + 1)) + "'s Turn.\n";
+			ui->drawMessage(msg);
+			ui->drawCaptured(players);
+
 			// 2) Test to see if King is in Check
 			if (board.isThreatened(*kings[curPlayer])) {
 				inCheck = true;
@@ -157,7 +165,7 @@ void Game::play(UI* ui, Mode mode) {
 			// 4) Check end conditions
 			if (playables.size() == 0) {
 				if (inCheck) {	// Other player won
-					ui->drawMessage("Player __ Won!");	// TODO - make non-current player number print here
+					ui->drawMessage("Player " + std::to_string((1 - curPlayer) + 1) + " Won!");	// TODO - make non-current player number print here
 				}
 				else {			// draw
 					ui->drawMessage("Draw!");
@@ -191,11 +199,9 @@ void Game::play(UI* ui, Mode mode) {
 
 			// Check for Forfeiture
 			if (input.x == -1 || input.y == -1) {
-				msg = "Player " + (curPlayer+1);
-				msg += " Forfeits.";
+				msg = "\nPlayer " + std::to_string(curPlayer+1) + " Forfeits.\n";
 				ui->drawMessage(msg);
-				msg = "Player " + ((1 - curPlayer) + 1);
-				msg += "Wins!";
+				msg = "Player " + std::to_string((1 - curPlayer) + 1) + " Wins!\n";
 				ui->drawMessage(msg);
 
 				done = true;

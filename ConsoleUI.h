@@ -22,6 +22,9 @@ public:
 	// Draws the provided message string to the screen (use for win/loss/draw messages)
 	void drawMessage(std::string msg) override;
 
+	// Draws the list of captured pieces for each player to the screen
+	void drawCaptured(Player(&players)[2]) override;
+
 private:
 
 };

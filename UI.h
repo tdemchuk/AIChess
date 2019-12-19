@@ -3,6 +3,7 @@
 
 
 #include "Gameboard.h"
+#include "Player.h"
 #include "Gamemode.h"
 
 /*
@@ -27,6 +28,9 @@ public:
 
 	// Draws the provided message string to the screen (use for win/loss/draw messages)
 	virtual void drawMessage(std::string msg) = 0;
+
+	// Draws the list of captured pieces for each player to the screen
+	virtual void drawCaptured(Player(&players)[2]) = 0;
 
 private:
 

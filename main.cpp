@@ -1,5 +1,5 @@
 
-//#define GUI_ON		// Uncomment to use experimental GUI. Otherwise console-based UI will be used
+//#define GUI_ON		// Uncomment to use experimental GUI. Otherwise console-based UI will be used ||| **GUI UNFINISHED**
 
 
 #include "Game.h"
@@ -13,8 +13,7 @@
 
 int main(int argc, char* argv[])
 {
-	// TODO - Init UI Here, pass into Game's play() function
-#ifndef GUI_ON
+#ifndef GUI_ON	// NO GUI
 	UI* ui = new ConsoleUI();
 #endif
 	
