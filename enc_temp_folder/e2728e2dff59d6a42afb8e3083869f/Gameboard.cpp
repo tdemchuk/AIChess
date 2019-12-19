@@ -140,8 +140,8 @@ Piece * Gameboard::move(Piece * piece, Move to)
 		glm::vec2 capLoc = to.coord - glm::vec2(piece->orientation(),0);
 		captured = check(capLoc);
 		m_board[xytoi(capLoc)].set(nullptr);
-		//std::cout << "\tCaptured : ";
-		//print(captured);
+		std::cout << "\tCaptured : ";
+		print(captured);
 	}
 	m_board[from].set(nullptr);
 
