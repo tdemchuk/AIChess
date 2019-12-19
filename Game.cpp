@@ -1,7 +1,8 @@
 
 #include "Game.h"
 #include "Player.h"
-#include "AI.h"
+#include "AI.h" //Daniel Edit
+#include <fstream>	// for input file
 
 /* GAME CLASS DEFINITIONS */
 /*
@@ -25,6 +26,9 @@ void Game::play(UI* ui, Mode mode) {
 	// 1) Init Players, Pieces
 	Player players[] = {Player(Color::WHITE), Player(Color::BLACK)};
 	Piece* kings[2];
+
+	// Attempt to read board override file
+	std::ifstream file("board.bof");
 
 	players[0].create(Piece::Type::ROOK, glm::vec2(0, 0), board);
 	players[0].create(Piece::Type::KNIGHT, glm::vec2(0, 1), board);
